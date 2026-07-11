@@ -73,19 +73,23 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Digital Scoreboard Tenis Meja" },
+      { title: "Digital Scoreboard Tenis Meja — Papan Skor Real-Time" },
       {
         name: "description",
-        content: "Papan skor digital tenis meja real-time: display proyektor, remote controller, dan aturan skor otomatis.",
+        content: "Papan skor digital tenis meja untuk turnamen: tampilan proyektor fullscreen, remote controller di HP, dan sinkronisasi real-time.",
       },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Digital Scoreboard Tenis Meja" },
+      { property: "og:title", content: "Digital Scoreboard Tenis Meja — Papan Skor Real-Time" },
       {
         property: "og:description",
-        content: "Papan skor digital tenis meja real-time untuk turnamen: display, controller, dan sinkronisasi langsung.",
+        content: "Papan skor digital tenis meja untuk turnamen: tampilan proyektor fullscreen, remote controller di HP, dan sinkronisasi real-time.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Digital Scoreboard Tenis Meja — Papan Skor Real-Time" },
+      { name: "twitter:description", content: "Papan skor digital tenis meja untuk turnamen: tampilan proyektor fullscreen, remote controller di HP, dan sinkronisasi real-time." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/a2f822f6-ae99-4923-8b82-940d036622bf" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/a2f822f6-ae99-4923-8b82-940d036622bf" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
