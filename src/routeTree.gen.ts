@@ -14,6 +14,8 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DisplayMatchCodeRouteImport } from './routes/display.$matchCode'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedMatchesIndexRouteImport } from './routes/_authenticated/matches.index'
 import { Route as AuthenticatedControllerMatchCodeRouteImport } from './routes/_authenticated/controller.$matchCode'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -40,6 +42,17 @@ const DisplayMatchCodeRoute = DisplayMatchCodeRouteImport.update({
   path: '/display/$matchCode',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedMatchesIndexRoute =
+  AuthenticatedMatchesIndexRouteImport.update({
+    id: '/matches/',
+    path: '/matches/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedControllerMatchCodeRoute =
   AuthenticatedControllerMatchCodeRouteImport.update({
     id: '/controller/$matchCode',
@@ -51,15 +64,19 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/display/$matchCode': typeof DisplayMatchCodeRoute
   '/controller/$matchCode': typeof AuthenticatedControllerMatchCodeRoute
+  '/matches/': typeof AuthenticatedMatchesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
   '/display/$matchCode': typeof DisplayMatchCodeRoute
   '/controller/$matchCode': typeof AuthenticatedControllerMatchCodeRoute
+  '/matches': typeof AuthenticatedMatchesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -67,8 +84,10 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/display/$matchCode': typeof DisplayMatchCodeRoute
   '/_authenticated/controller/$matchCode': typeof AuthenticatedControllerMatchCodeRoute
+  '/_authenticated/matches/': typeof AuthenticatedMatchesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -76,23 +95,29 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/reset-password'
+    | '/dashboard'
     | '/display/$matchCode'
     | '/controller/$matchCode'
+    | '/matches/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/login'
     | '/reset-password'
+    | '/dashboard'
     | '/display/$matchCode'
     | '/controller/$matchCode'
+    | '/matches'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
     | '/login'
     | '/reset-password'
+    | '/_authenticated/dashboard'
     | '/display/$matchCode'
     | '/_authenticated/controller/$matchCode'
+    | '/_authenticated/matches/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -140,6 +165,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DisplayMatchCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/matches/': {
+      id: '/_authenticated/matches/'
+      path: '/matches'
+      fullPath: '/matches/'
+      preLoaderRoute: typeof AuthenticatedMatchesIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/controller/$matchCode': {
       id: '/_authenticated/controller/$matchCode'
       path: '/controller/$matchCode'
@@ -151,11 +190,15 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedControllerMatchCodeRoute: typeof AuthenticatedControllerMatchCodeRoute
+  AuthenticatedMatchesIndexRoute: typeof AuthenticatedMatchesIndexRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedControllerMatchCodeRoute: AuthenticatedControllerMatchCodeRoute,
+  AuthenticatedMatchesIndexRoute: AuthenticatedMatchesIndexRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
