@@ -9,11 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DisplayMatchCodeRouteImport } from './routes/display.$matchCode'
+import { Route as AuthenticatedThemesRouteImport } from './routes/_authenticated/themes'
+import { Route as AuthenticatedSettingsRouteImport } from './routes/_authenticated/settings'
+import { Route as AuthenticatedOperatorsRouteImport } from './routes/_authenticated/operators'
+import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedMatchesIndexRouteImport } from './routes/_authenticated/matches.index'
 import { Route as AuthenticatedMatchesCreateRouteImport } from './routes/_authenticated/matches.create'
@@ -21,6 +26,11 @@ import { Route as AuthenticatedControllerMatchCodeRouteImport } from './routes/_
 import { Route as AuthenticatedMatchesIdResultRouteImport } from './routes/_authenticated/matches.$id.result'
 import { Route as AuthenticatedMatchesIdEditRouteImport } from './routes/_authenticated/matches.$id.edit'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
   path: '/reset-password',
@@ -44,6 +54,26 @@ const DisplayMatchCodeRoute = DisplayMatchCodeRouteImport.update({
   id: '/display/$matchCode',
   path: '/display/$matchCode',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedThemesRoute = AuthenticatedThemesRouteImport.update({
+  id: '/themes',
+  path: '/themes',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedSettingsRoute = AuthenticatedSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedOperatorsRoute = AuthenticatedOperatorsRouteImport.update({
+  id: '/operators',
+  path: '/operators',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedHistoryRoute = AuthenticatedHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
@@ -85,7 +115,12 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/history': typeof AuthenticatedHistoryRoute
+  '/operators': typeof AuthenticatedOperatorsRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/themes': typeof AuthenticatedThemesRoute
   '/display/$matchCode': typeof DisplayMatchCodeRoute
   '/controller/$matchCode': typeof AuthenticatedControllerMatchCodeRoute
   '/matches/create': typeof AuthenticatedMatchesCreateRoute
@@ -97,7 +132,12 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
+  '/history': typeof AuthenticatedHistoryRoute
+  '/operators': typeof AuthenticatedOperatorsRoute
+  '/settings': typeof AuthenticatedSettingsRoute
+  '/themes': typeof AuthenticatedThemesRoute
   '/display/$matchCode': typeof DisplayMatchCodeRoute
   '/controller/$matchCode': typeof AuthenticatedControllerMatchCodeRoute
   '/matches/create': typeof AuthenticatedMatchesCreateRoute
@@ -111,7 +151,12 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/history': typeof AuthenticatedHistoryRoute
+  '/_authenticated/operators': typeof AuthenticatedOperatorsRoute
+  '/_authenticated/settings': typeof AuthenticatedSettingsRoute
+  '/_authenticated/themes': typeof AuthenticatedThemesRoute
   '/display/$matchCode': typeof DisplayMatchCodeRoute
   '/_authenticated/controller/$matchCode': typeof AuthenticatedControllerMatchCodeRoute
   '/_authenticated/matches/create': typeof AuthenticatedMatchesCreateRoute
@@ -125,7 +170,12 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/dashboard'
+    | '/history'
+    | '/operators'
+    | '/settings'
+    | '/themes'
     | '/display/$matchCode'
     | '/controller/$matchCode'
     | '/matches/create'
@@ -137,7 +187,12 @@ export interface FileRouteTypes {
     | '/'
     | '/login'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/dashboard'
+    | '/history'
+    | '/operators'
+    | '/settings'
+    | '/themes'
     | '/display/$matchCode'
     | '/controller/$matchCode'
     | '/matches/create'
@@ -150,7 +205,12 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/login'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/_authenticated/dashboard'
+    | '/_authenticated/history'
+    | '/_authenticated/operators'
+    | '/_authenticated/settings'
+    | '/_authenticated/themes'
     | '/display/$matchCode'
     | '/_authenticated/controller/$matchCode'
     | '/_authenticated/matches/create'
@@ -164,11 +224,19 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   DisplayMatchCodeRoute: typeof DisplayMatchCodeRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/reset-password': {
       id: '/reset-password'
       path: '/reset-password'
@@ -203,6 +271,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/display/$matchCode'
       preLoaderRoute: typeof DisplayMatchCodeRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/themes': {
+      id: '/_authenticated/themes'
+      path: '/themes'
+      fullPath: '/themes'
+      preLoaderRoute: typeof AuthenticatedThemesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/settings': {
+      id: '/_authenticated/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof AuthenticatedSettingsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/operators': {
+      id: '/_authenticated/operators'
+      path: '/operators'
+      fullPath: '/operators'
+      preLoaderRoute: typeof AuthenticatedOperatorsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/history': {
+      id: '/_authenticated/history'
+      path: '/history'
+      fullPath: '/history'
+      preLoaderRoute: typeof AuthenticatedHistoryRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/dashboard': {
       id: '/_authenticated/dashboard'
@@ -251,6 +347,10 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedHistoryRoute: typeof AuthenticatedHistoryRoute
+  AuthenticatedOperatorsRoute: typeof AuthenticatedOperatorsRoute
+  AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
+  AuthenticatedThemesRoute: typeof AuthenticatedThemesRoute
   AuthenticatedControllerMatchCodeRoute: typeof AuthenticatedControllerMatchCodeRoute
   AuthenticatedMatchesCreateRoute: typeof AuthenticatedMatchesCreateRoute
   AuthenticatedMatchesIndexRoute: typeof AuthenticatedMatchesIndexRoute
@@ -260,6 +360,10 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedHistoryRoute: AuthenticatedHistoryRoute,
+  AuthenticatedOperatorsRoute: AuthenticatedOperatorsRoute,
+  AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
+  AuthenticatedThemesRoute: AuthenticatedThemesRoute,
   AuthenticatedControllerMatchCodeRoute: AuthenticatedControllerMatchCodeRoute,
   AuthenticatedMatchesCreateRoute: AuthenticatedMatchesCreateRoute,
   AuthenticatedMatchesIndexRoute: AuthenticatedMatchesIndexRoute,
@@ -275,6 +379,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   DisplayMatchCodeRoute: DisplayMatchCodeRoute,
 }
 export const routeTree = rootRouteImport
