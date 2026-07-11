@@ -14,16 +14,381 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      match_sets: {
+        Row: {
+          created_at: string
+          id: string
+          match_id: string
+          score_left: number
+          score_right: number
+          set_number: number
+          winner: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          match_id: string
+          score_left?: number
+          score_right?: number
+          set_number: number
+          winner?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          match_id?: string
+          score_left?: number
+          score_right?: number
+          set_number?: number
+          winner?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_sets_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matches: {
+        Row: {
+          auto_rules: boolean
+          best_of: number
+          category: string | null
+          created_at: string
+          created_by: string
+          finished_at: string | null
+          id: string
+          initial_server: string
+          match_code: string
+          match_status: string
+          notes: string | null
+          operator_id: string | null
+          player_left_name: string
+          player_left_photo: string | null
+          player_left_team: string | null
+          player_right_name: string
+          player_right_photo: string | null
+          player_right_team: string | null
+          round_name: string | null
+          score_left: number
+          score_right: number
+          serving_player: string
+          sets_left: number
+          sets_right: number
+          started_at: string | null
+          table_number: string | null
+          target_score: number
+          theme_id: string | null
+          timer_duration: number | null
+          timer_elapsed: number
+          timer_mode: string
+          timer_paused_at: string | null
+          timer_started_at: string | null
+          tournament_id: string | null
+          updated_at: string
+          winner: string | null
+        }
+        Insert: {
+          auto_rules?: boolean
+          best_of?: number
+          category?: string | null
+          created_at?: string
+          created_by: string
+          finished_at?: string | null
+          id?: string
+          initial_server?: string
+          match_code: string
+          match_status?: string
+          notes?: string | null
+          operator_id?: string | null
+          player_left_name: string
+          player_left_photo?: string | null
+          player_left_team?: string | null
+          player_right_name: string
+          player_right_photo?: string | null
+          player_right_team?: string | null
+          round_name?: string | null
+          score_left?: number
+          score_right?: number
+          serving_player?: string
+          sets_left?: number
+          sets_right?: number
+          started_at?: string | null
+          table_number?: string | null
+          target_score?: number
+          theme_id?: string | null
+          timer_duration?: number | null
+          timer_elapsed?: number
+          timer_mode?: string
+          timer_paused_at?: string | null
+          timer_started_at?: string | null
+          tournament_id?: string | null
+          updated_at?: string
+          winner?: string | null
+        }
+        Update: {
+          auto_rules?: boolean
+          best_of?: number
+          category?: string | null
+          created_at?: string
+          created_by?: string
+          finished_at?: string | null
+          id?: string
+          initial_server?: string
+          match_code?: string
+          match_status?: string
+          notes?: string | null
+          operator_id?: string | null
+          player_left_name?: string
+          player_left_photo?: string | null
+          player_left_team?: string | null
+          player_right_name?: string
+          player_right_photo?: string | null
+          player_right_team?: string | null
+          round_name?: string | null
+          score_left?: number
+          score_right?: number
+          serving_player?: string
+          sets_left?: number
+          sets_right?: number
+          started_at?: string | null
+          table_number?: string | null
+          target_score?: number
+          theme_id?: string | null
+          timer_duration?: number | null
+          timer_elapsed?: number
+          timer_mode?: string
+          timer_paused_at?: string | null
+          timer_started_at?: string | null
+          tournament_id?: string | null
+          updated_at?: string
+          winner?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "matches_theme_id_fkey"
+            columns: ["theme_id"]
+            isOneToOne: false
+            referencedRelation: "themes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "matches_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      score_events: {
+        Row: {
+          action_type: string
+          created_at: string
+          id: string
+          match_id: string
+          new_value: string | null
+          operator_id: string | null
+          player_side: string | null
+          previous_value: string | null
+        }
+        Insert: {
+          action_type: string
+          created_at?: string
+          id?: string
+          match_id: string
+          new_value?: string | null
+          operator_id?: string | null
+          player_side?: string | null
+          previous_value?: string | null
+        }
+        Update: {
+          action_type?: string
+          created_at?: string
+          id?: string
+          match_id?: string
+          new_value?: string | null
+          operator_id?: string | null
+          player_side?: string | null
+          previous_value?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "score_events_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      themes: {
+        Row: {
+          accent_color: string
+          background_opacity: number | null
+          background_url: string | null
+          created_at: string
+          created_by: string | null
+          custom_css: string | null
+          font_family: string | null
+          id: string
+          is_preset: boolean
+          left_player_color: string
+          logo_url: string | null
+          primary_color: string
+          right_player_color: string
+          secondary_color: string
+          text_color: string
+          theme_name: string
+          updated_at: string
+        }
+        Insert: {
+          accent_color?: string
+          background_opacity?: number | null
+          background_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          custom_css?: string | null
+          font_family?: string | null
+          id?: string
+          is_preset?: boolean
+          left_player_color?: string
+          logo_url?: string | null
+          primary_color?: string
+          right_player_color?: string
+          secondary_color?: string
+          text_color?: string
+          theme_name: string
+          updated_at?: string
+        }
+        Update: {
+          accent_color?: string
+          background_opacity?: number | null
+          background_url?: string | null
+          created_at?: string
+          created_by?: string | null
+          custom_css?: string | null
+          font_family?: string | null
+          id?: string
+          is_preset?: boolean
+          left_player_color?: string
+          logo_url?: string | null
+          primary_color?: string
+          right_player_color?: string
+          secondary_color?: string
+          text_color?: string
+          theme_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tournaments: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          logo_url: string | null
+          organizer_name: string | null
+          poster_url: string | null
+          theme_id: string | null
+          tournament_name: string
+          updated_at: string
+          venue: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          logo_url?: string | null
+          organizer_name?: string | null
+          poster_url?: string | null
+          theme_id?: string | null
+          tournament_name: string
+          updated_at?: string
+          venue?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          logo_url?: string | null
+          organizer_name?: string | null
+          poster_url?: string | null
+          theme_id?: string | null
+          tournament_name?: string
+          updated_at?: string
+          venue?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tournaments_theme_id_fkey"
+            columns: ["theme_id"]
+            isOneToOne: false
+            referencedRelation: "themes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "operator"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +515,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "operator"],
+    },
   },
 } as const
