@@ -16,7 +16,10 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as DisplayMatchCodeRouteImport } from './routes/display.$matchCode'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedMatchesIndexRouteImport } from './routes/_authenticated/matches.index'
+import { Route as AuthenticatedMatchesCreateRouteImport } from './routes/_authenticated/matches.create'
 import { Route as AuthenticatedControllerMatchCodeRouteImport } from './routes/_authenticated/controller.$matchCode'
+import { Route as AuthenticatedMatchesIdResultRouteImport } from './routes/_authenticated/matches.$id.result'
+import { Route as AuthenticatedMatchesIdEditRouteImport } from './routes/_authenticated/matches.$id.edit'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -53,10 +56,28 @@ const AuthenticatedMatchesIndexRoute =
     path: '/matches/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedMatchesCreateRoute =
+  AuthenticatedMatchesCreateRouteImport.update({
+    id: '/matches/create',
+    path: '/matches/create',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedControllerMatchCodeRoute =
   AuthenticatedControllerMatchCodeRouteImport.update({
     id: '/controller/$matchCode',
     path: '/controller/$matchCode',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedMatchesIdResultRoute =
+  AuthenticatedMatchesIdResultRouteImport.update({
+    id: '/matches/$id/result',
+    path: '/matches/$id/result',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedMatchesIdEditRoute =
+  AuthenticatedMatchesIdEditRouteImport.update({
+    id: '/matches/$id/edit',
+    path: '/matches/$id/edit',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 
@@ -67,7 +88,10 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/display/$matchCode': typeof DisplayMatchCodeRoute
   '/controller/$matchCode': typeof AuthenticatedControllerMatchCodeRoute
+  '/matches/create': typeof AuthenticatedMatchesCreateRoute
   '/matches/': typeof AuthenticatedMatchesIndexRoute
+  '/matches/$id/edit': typeof AuthenticatedMatchesIdEditRoute
+  '/matches/$id/result': typeof AuthenticatedMatchesIdResultRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -76,7 +100,10 @@ export interface FileRoutesByTo {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/display/$matchCode': typeof DisplayMatchCodeRoute
   '/controller/$matchCode': typeof AuthenticatedControllerMatchCodeRoute
+  '/matches/create': typeof AuthenticatedMatchesCreateRoute
   '/matches': typeof AuthenticatedMatchesIndexRoute
+  '/matches/$id/edit': typeof AuthenticatedMatchesIdEditRoute
+  '/matches/$id/result': typeof AuthenticatedMatchesIdResultRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -87,7 +114,10 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/display/$matchCode': typeof DisplayMatchCodeRoute
   '/_authenticated/controller/$matchCode': typeof AuthenticatedControllerMatchCodeRoute
+  '/_authenticated/matches/create': typeof AuthenticatedMatchesCreateRoute
   '/_authenticated/matches/': typeof AuthenticatedMatchesIndexRoute
+  '/_authenticated/matches/$id/edit': typeof AuthenticatedMatchesIdEditRoute
+  '/_authenticated/matches/$id/result': typeof AuthenticatedMatchesIdResultRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -98,7 +128,10 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/display/$matchCode'
     | '/controller/$matchCode'
+    | '/matches/create'
     | '/matches/'
+    | '/matches/$id/edit'
+    | '/matches/$id/result'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -107,7 +140,10 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/display/$matchCode'
     | '/controller/$matchCode'
+    | '/matches/create'
     | '/matches'
+    | '/matches/$id/edit'
+    | '/matches/$id/result'
   id:
     | '__root__'
     | '/'
@@ -117,7 +153,10 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/display/$matchCode'
     | '/_authenticated/controller/$matchCode'
+    | '/_authenticated/matches/create'
     | '/_authenticated/matches/'
+    | '/_authenticated/matches/$id/edit'
+    | '/_authenticated/matches/$id/result'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -179,11 +218,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMatchesIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/matches/create': {
+      id: '/_authenticated/matches/create'
+      path: '/matches/create'
+      fullPath: '/matches/create'
+      preLoaderRoute: typeof AuthenticatedMatchesCreateRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/controller/$matchCode': {
       id: '/_authenticated/controller/$matchCode'
       path: '/controller/$matchCode'
       fullPath: '/controller/$matchCode'
       preLoaderRoute: typeof AuthenticatedControllerMatchCodeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/matches/$id/result': {
+      id: '/_authenticated/matches/$id/result'
+      path: '/matches/$id/result'
+      fullPath: '/matches/$id/result'
+      preLoaderRoute: typeof AuthenticatedMatchesIdResultRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/matches/$id/edit': {
+      id: '/_authenticated/matches/$id/edit'
+      path: '/matches/$id/edit'
+      fullPath: '/matches/$id/edit'
+      preLoaderRoute: typeof AuthenticatedMatchesIdEditRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
   }
@@ -192,13 +252,19 @@ declare module '@tanstack/react-router' {
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedControllerMatchCodeRoute: typeof AuthenticatedControllerMatchCodeRoute
+  AuthenticatedMatchesCreateRoute: typeof AuthenticatedMatchesCreateRoute
   AuthenticatedMatchesIndexRoute: typeof AuthenticatedMatchesIndexRoute
+  AuthenticatedMatchesIdEditRoute: typeof AuthenticatedMatchesIdEditRoute
+  AuthenticatedMatchesIdResultRoute: typeof AuthenticatedMatchesIdResultRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedControllerMatchCodeRoute: AuthenticatedControllerMatchCodeRoute,
+  AuthenticatedMatchesCreateRoute: AuthenticatedMatchesCreateRoute,
   AuthenticatedMatchesIndexRoute: AuthenticatedMatchesIndexRoute,
+  AuthenticatedMatchesIdEditRoute: AuthenticatedMatchesIdEditRoute,
+  AuthenticatedMatchesIdResultRoute: AuthenticatedMatchesIdResultRoute,
 }
 
 const AuthenticatedRouteRouteWithChildren =
