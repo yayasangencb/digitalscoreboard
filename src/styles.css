@@ -144,3 +144,26 @@
     display: none !important;
   }
 }
+
+/* Bracket-specific animations */
+@keyframes bracket-flow {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+@keyframes bracket-pulse {
+  0%, 100% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes bracket-active {
+  0%, 100% {
+    box-shadow: 0 0 0 0 var(--accent);
+  }
+  50% {
+    box-shadow: 0 0 14px 2px var(--accent);
+  }
+}
