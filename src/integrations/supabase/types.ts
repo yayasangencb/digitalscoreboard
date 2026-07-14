@@ -14,6 +14,323 @@ export type Database = {
   }
   public: {
     Tables: {
+      bracket_display_sessions: {
+        Row: {
+          animation_status: string
+          bracket_id: string
+          created_at: string
+          current_focus: string | null
+          current_round: number | null
+          display_mode: string
+          id: string
+          last_updated_by: string | null
+          pan_x: number
+          pan_y: number
+          session_code: string
+          updated_at: string
+          zoom_level: number
+        }
+        Insert: {
+          animation_status?: string
+          bracket_id: string
+          created_at?: string
+          current_focus?: string | null
+          current_round?: number | null
+          display_mode?: string
+          id?: string
+          last_updated_by?: string | null
+          pan_x?: number
+          pan_y?: number
+          session_code: string
+          updated_at?: string
+          zoom_level?: number
+        }
+        Update: {
+          animation_status?: string
+          bracket_id?: string
+          created_at?: string
+          current_focus?: string | null
+          current_round?: number | null
+          display_mode?: string
+          id?: string
+          last_updated_by?: string | null
+          pan_x?: number
+          pan_y?: number
+          session_code?: string
+          updated_at?: string
+          zoom_level?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bracket_display_sessions_bracket_id_fkey"
+            columns: ["bracket_id"]
+            isOneToOne: false
+            referencedRelation: "brackets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bracket_matches: {
+        Row: {
+          bracket_id: string
+          created_at: string
+          id: string
+          match_number: number
+          match_status: string
+          next_match_id: string | null
+          next_match_position: string | null
+          player_one_id: string | null
+          player_two_id: string | null
+          position_in_round: number
+          round_number: number
+          scheduled_at: string | null
+          score_player_one: number | null
+          score_player_two: number | null
+          scoreboard_match_id: string | null
+          table_number: number | null
+          updated_at: string
+          winner_id: string | null
+        }
+        Insert: {
+          bracket_id: string
+          created_at?: string
+          id?: string
+          match_number: number
+          match_status?: string
+          next_match_id?: string | null
+          next_match_position?: string | null
+          player_one_id?: string | null
+          player_two_id?: string | null
+          position_in_round: number
+          round_number: number
+          scheduled_at?: string | null
+          score_player_one?: number | null
+          score_player_two?: number | null
+          scoreboard_match_id?: string | null
+          table_number?: number | null
+          updated_at?: string
+          winner_id?: string | null
+        }
+        Update: {
+          bracket_id?: string
+          created_at?: string
+          id?: string
+          match_number?: number
+          match_status?: string
+          next_match_id?: string | null
+          next_match_position?: string | null
+          player_one_id?: string | null
+          player_two_id?: string | null
+          position_in_round?: number
+          round_number?: number
+          scheduled_at?: string | null
+          score_player_one?: number | null
+          score_player_two?: number | null
+          scoreboard_match_id?: string | null
+          table_number?: number | null
+          updated_at?: string
+          winner_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bracket_matches_bracket_id_fkey"
+            columns: ["bracket_id"]
+            isOneToOne: false
+            referencedRelation: "brackets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bracket_matches_next_match_id_fkey"
+            columns: ["next_match_id"]
+            isOneToOne: false
+            referencedRelation: "bracket_matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bracket_matches_player_one_id_fkey"
+            columns: ["player_one_id"]
+            isOneToOne: false
+            referencedRelation: "bracket_participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bracket_matches_player_two_id_fkey"
+            columns: ["player_two_id"]
+            isOneToOne: false
+            referencedRelation: "bracket_participants"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bracket_matches_scoreboard_match_id_fkey"
+            columns: ["scoreboard_match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "bracket_matches_winner_id_fkey"
+            columns: ["winner_id"]
+            isOneToOne: false
+            referencedRelation: "bracket_participants"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bracket_participants: {
+        Row: {
+          bracket_id: string
+          created_at: string
+          id: string
+          initial_position: number
+          name: string
+          photo_url: string | null
+          seed_number: number | null
+          status: string
+          team: string | null
+          updated_at: string
+        }
+        Insert: {
+          bracket_id: string
+          created_at?: string
+          id?: string
+          initial_position: number
+          name: string
+          photo_url?: string | null
+          seed_number?: number | null
+          status?: string
+          team?: string | null
+          updated_at?: string
+        }
+        Update: {
+          bracket_id?: string
+          created_at?: string
+          id?: string
+          initial_position?: number
+          name?: string
+          photo_url?: string | null
+          seed_number?: number | null
+          status?: string
+          team?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "bracket_participants_bracket_id_fkey"
+            columns: ["bracket_id"]
+            isOneToOne: false
+            referencedRelation: "brackets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      brackets: {
+        Row: {
+          animation_speed: number
+          animation_type: string
+          auto_tour_enabled: boolean
+          background_url: string | null
+          box_color: string | null
+          bracket_type: string
+          category: string | null
+          created_at: string
+          created_by: string
+          display_mode: string
+          id: string
+          line_animation: string
+          line_thickness: number
+          location: string | null
+          logo_url: string | null
+          name: string
+          operator_name: string | null
+          participant_count: number
+          round_spacing: number
+          scheduled_date: string | null
+          show_photos: boolean
+          show_scores: boolean
+          show_team_logos: boolean
+          status: string
+          table_count: number | null
+          theme_id: string | null
+          tournament_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          animation_speed?: number
+          animation_type?: string
+          auto_tour_enabled?: boolean
+          background_url?: string | null
+          box_color?: string | null
+          bracket_type?: string
+          category?: string | null
+          created_at?: string
+          created_by: string
+          display_mode?: string
+          id?: string
+          line_animation?: string
+          line_thickness?: number
+          location?: string | null
+          logo_url?: string | null
+          name: string
+          operator_name?: string | null
+          participant_count?: number
+          round_spacing?: number
+          scheduled_date?: string | null
+          show_photos?: boolean
+          show_scores?: boolean
+          show_team_logos?: boolean
+          status?: string
+          table_count?: number | null
+          theme_id?: string | null
+          tournament_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          animation_speed?: number
+          animation_type?: string
+          auto_tour_enabled?: boolean
+          background_url?: string | null
+          box_color?: string | null
+          bracket_type?: string
+          category?: string | null
+          created_at?: string
+          created_by?: string
+          display_mode?: string
+          id?: string
+          line_animation?: string
+          line_thickness?: number
+          location?: string | null
+          logo_url?: string | null
+          name?: string
+          operator_name?: string | null
+          participant_count?: number
+          round_spacing?: number
+          scheduled_date?: string | null
+          show_photos?: boolean
+          show_scores?: boolean
+          show_team_logos?: boolean
+          status?: string
+          table_count?: number | null
+          theme_id?: string | null
+          tournament_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "brackets_theme_id_fkey"
+            columns: ["theme_id"]
+            isOneToOne: false
+            referencedRelation: "themes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "brackets_tournament_id_fkey"
+            columns: ["tournament_id"]
+            isOneToOne: false
+            referencedRelation: "tournaments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       match_sets: {
         Row: {
           created_at: string
