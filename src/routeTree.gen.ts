@@ -21,10 +21,15 @@ import { Route as AuthenticatedOperatorsRouteImport } from './routes/_authentica
 import { Route as AuthenticatedHistoryRouteImport } from './routes/_authenticated/history'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedMatchesIndexRouteImport } from './routes/_authenticated/matches.index'
+import { Route as AuthenticatedBracketsIndexRouteImport } from './routes/_authenticated/brackets.index'
+import { Route as BracketsIdPreviewRouteImport } from './routes/brackets.$id.preview'
+import { Route as BracketsIdDisplayRouteImport } from './routes/brackets.$id.display'
 import { Route as AuthenticatedMatchesCreateRouteImport } from './routes/_authenticated/matches.create'
 import { Route as AuthenticatedControllerMatchCodeRouteImport } from './routes/_authenticated/controller.$matchCode'
+import { Route as AuthenticatedBracketsCreateRouteImport } from './routes/_authenticated/brackets.create'
 import { Route as AuthenticatedMatchesIdResultRouteImport } from './routes/_authenticated/matches.$id.result'
 import { Route as AuthenticatedMatchesIdEditRouteImport } from './routes/_authenticated/matches.$id.edit'
+import { Route as AuthenticatedBracketsIdEditRouteImport } from './routes/_authenticated/brackets.$id.edit'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -86,6 +91,22 @@ const AuthenticatedMatchesIndexRoute =
     path: '/matches/',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedBracketsIndexRoute =
+  AuthenticatedBracketsIndexRouteImport.update({
+    id: '/brackets/',
+    path: '/brackets/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const BracketsIdPreviewRoute = BracketsIdPreviewRouteImport.update({
+  id: '/brackets/$id/preview',
+  path: '/brackets/$id/preview',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BracketsIdDisplayRoute = BracketsIdDisplayRouteImport.update({
+  id: '/brackets/$id/display',
+  path: '/brackets/$id/display',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedMatchesCreateRoute =
   AuthenticatedMatchesCreateRouteImport.update({
     id: '/matches/create',
@@ -96,6 +117,12 @@ const AuthenticatedControllerMatchCodeRoute =
   AuthenticatedControllerMatchCodeRouteImport.update({
     id: '/controller/$matchCode',
     path: '/controller/$matchCode',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
+const AuthenticatedBracketsCreateRoute =
+  AuthenticatedBracketsCreateRouteImport.update({
+    id: '/brackets/create',
+    path: '/brackets/create',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
 const AuthenticatedMatchesIdResultRoute =
@@ -110,6 +137,12 @@ const AuthenticatedMatchesIdEditRoute =
     path: '/matches/$id/edit',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedBracketsIdEditRoute =
+  AuthenticatedBracketsIdEditRouteImport.update({
+    id: '/brackets/$id/edit',
+    path: '/brackets/$id/edit',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -122,9 +155,14 @@ export interface FileRoutesByFullPath {
   '/settings': typeof AuthenticatedSettingsRoute
   '/themes': typeof AuthenticatedThemesRoute
   '/display/$matchCode': typeof DisplayMatchCodeRoute
+  '/brackets/create': typeof AuthenticatedBracketsCreateRoute
   '/controller/$matchCode': typeof AuthenticatedControllerMatchCodeRoute
   '/matches/create': typeof AuthenticatedMatchesCreateRoute
+  '/brackets/$id/display': typeof BracketsIdDisplayRoute
+  '/brackets/$id/preview': typeof BracketsIdPreviewRoute
+  '/brackets/': typeof AuthenticatedBracketsIndexRoute
   '/matches/': typeof AuthenticatedMatchesIndexRoute
+  '/brackets/$id/edit': typeof AuthenticatedBracketsIdEditRoute
   '/matches/$id/edit': typeof AuthenticatedMatchesIdEditRoute
   '/matches/$id/result': typeof AuthenticatedMatchesIdResultRoute
 }
@@ -139,9 +177,14 @@ export interface FileRoutesByTo {
   '/settings': typeof AuthenticatedSettingsRoute
   '/themes': typeof AuthenticatedThemesRoute
   '/display/$matchCode': typeof DisplayMatchCodeRoute
+  '/brackets/create': typeof AuthenticatedBracketsCreateRoute
   '/controller/$matchCode': typeof AuthenticatedControllerMatchCodeRoute
   '/matches/create': typeof AuthenticatedMatchesCreateRoute
+  '/brackets/$id/display': typeof BracketsIdDisplayRoute
+  '/brackets/$id/preview': typeof BracketsIdPreviewRoute
+  '/brackets': typeof AuthenticatedBracketsIndexRoute
   '/matches': typeof AuthenticatedMatchesIndexRoute
+  '/brackets/$id/edit': typeof AuthenticatedBracketsIdEditRoute
   '/matches/$id/edit': typeof AuthenticatedMatchesIdEditRoute
   '/matches/$id/result': typeof AuthenticatedMatchesIdResultRoute
 }
@@ -158,9 +201,14 @@ export interface FileRoutesById {
   '/_authenticated/settings': typeof AuthenticatedSettingsRoute
   '/_authenticated/themes': typeof AuthenticatedThemesRoute
   '/display/$matchCode': typeof DisplayMatchCodeRoute
+  '/_authenticated/brackets/create': typeof AuthenticatedBracketsCreateRoute
   '/_authenticated/controller/$matchCode': typeof AuthenticatedControllerMatchCodeRoute
   '/_authenticated/matches/create': typeof AuthenticatedMatchesCreateRoute
+  '/brackets/$id/display': typeof BracketsIdDisplayRoute
+  '/brackets/$id/preview': typeof BracketsIdPreviewRoute
+  '/_authenticated/brackets/': typeof AuthenticatedBracketsIndexRoute
   '/_authenticated/matches/': typeof AuthenticatedMatchesIndexRoute
+  '/_authenticated/brackets/$id/edit': typeof AuthenticatedBracketsIdEditRoute
   '/_authenticated/matches/$id/edit': typeof AuthenticatedMatchesIdEditRoute
   '/_authenticated/matches/$id/result': typeof AuthenticatedMatchesIdResultRoute
 }
@@ -177,9 +225,14 @@ export interface FileRouteTypes {
     | '/settings'
     | '/themes'
     | '/display/$matchCode'
+    | '/brackets/create'
     | '/controller/$matchCode'
     | '/matches/create'
+    | '/brackets/$id/display'
+    | '/brackets/$id/preview'
+    | '/brackets/'
     | '/matches/'
+    | '/brackets/$id/edit'
     | '/matches/$id/edit'
     | '/matches/$id/result'
   fileRoutesByTo: FileRoutesByTo
@@ -194,9 +247,14 @@ export interface FileRouteTypes {
     | '/settings'
     | '/themes'
     | '/display/$matchCode'
+    | '/brackets/create'
     | '/controller/$matchCode'
     | '/matches/create'
+    | '/brackets/$id/display'
+    | '/brackets/$id/preview'
+    | '/brackets'
     | '/matches'
+    | '/brackets/$id/edit'
     | '/matches/$id/edit'
     | '/matches/$id/result'
   id:
@@ -212,9 +270,14 @@ export interface FileRouteTypes {
     | '/_authenticated/settings'
     | '/_authenticated/themes'
     | '/display/$matchCode'
+    | '/_authenticated/brackets/create'
     | '/_authenticated/controller/$matchCode'
     | '/_authenticated/matches/create'
+    | '/brackets/$id/display'
+    | '/brackets/$id/preview'
+    | '/_authenticated/brackets/'
     | '/_authenticated/matches/'
+    | '/_authenticated/brackets/$id/edit'
     | '/_authenticated/matches/$id/edit'
     | '/_authenticated/matches/$id/result'
   fileRoutesById: FileRoutesById
@@ -226,6 +289,8 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   DisplayMatchCodeRoute: typeof DisplayMatchCodeRoute
+  BracketsIdDisplayRoute: typeof BracketsIdDisplayRoute
+  BracketsIdPreviewRoute: typeof BracketsIdPreviewRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -314,6 +379,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMatchesIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/brackets/': {
+      id: '/_authenticated/brackets/'
+      path: '/brackets'
+      fullPath: '/brackets/'
+      preLoaderRoute: typeof AuthenticatedBracketsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/brackets/$id/preview': {
+      id: '/brackets/$id/preview'
+      path: '/brackets/$id/preview'
+      fullPath: '/brackets/$id/preview'
+      preLoaderRoute: typeof BracketsIdPreviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/brackets/$id/display': {
+      id: '/brackets/$id/display'
+      path: '/brackets/$id/display'
+      fullPath: '/brackets/$id/display'
+      preLoaderRoute: typeof BracketsIdDisplayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated/matches/create': {
       id: '/_authenticated/matches/create'
       path: '/matches/create'
@@ -326,6 +412,13 @@ declare module '@tanstack/react-router' {
       path: '/controller/$matchCode'
       fullPath: '/controller/$matchCode'
       preLoaderRoute: typeof AuthenticatedControllerMatchCodeRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/brackets/create': {
+      id: '/_authenticated/brackets/create'
+      path: '/brackets/create'
+      fullPath: '/brackets/create'
+      preLoaderRoute: typeof AuthenticatedBracketsCreateRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/matches/$id/result': {
@@ -342,6 +435,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedMatchesIdEditRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/brackets/$id/edit': {
+      id: '/_authenticated/brackets/$id/edit'
+      path: '/brackets/$id/edit'
+      fullPath: '/brackets/$id/edit'
+      preLoaderRoute: typeof AuthenticatedBracketsIdEditRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
   }
 }
 
@@ -351,9 +451,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedOperatorsRoute: typeof AuthenticatedOperatorsRoute
   AuthenticatedSettingsRoute: typeof AuthenticatedSettingsRoute
   AuthenticatedThemesRoute: typeof AuthenticatedThemesRoute
+  AuthenticatedBracketsCreateRoute: typeof AuthenticatedBracketsCreateRoute
   AuthenticatedControllerMatchCodeRoute: typeof AuthenticatedControllerMatchCodeRoute
   AuthenticatedMatchesCreateRoute: typeof AuthenticatedMatchesCreateRoute
+  AuthenticatedBracketsIndexRoute: typeof AuthenticatedBracketsIndexRoute
   AuthenticatedMatchesIndexRoute: typeof AuthenticatedMatchesIndexRoute
+  AuthenticatedBracketsIdEditRoute: typeof AuthenticatedBracketsIdEditRoute
   AuthenticatedMatchesIdEditRoute: typeof AuthenticatedMatchesIdEditRoute
   AuthenticatedMatchesIdResultRoute: typeof AuthenticatedMatchesIdResultRoute
 }
@@ -364,9 +467,12 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedOperatorsRoute: AuthenticatedOperatorsRoute,
   AuthenticatedSettingsRoute: AuthenticatedSettingsRoute,
   AuthenticatedThemesRoute: AuthenticatedThemesRoute,
+  AuthenticatedBracketsCreateRoute: AuthenticatedBracketsCreateRoute,
   AuthenticatedControllerMatchCodeRoute: AuthenticatedControllerMatchCodeRoute,
   AuthenticatedMatchesCreateRoute: AuthenticatedMatchesCreateRoute,
+  AuthenticatedBracketsIndexRoute: AuthenticatedBracketsIndexRoute,
   AuthenticatedMatchesIndexRoute: AuthenticatedMatchesIndexRoute,
+  AuthenticatedBracketsIdEditRoute: AuthenticatedBracketsIdEditRoute,
   AuthenticatedMatchesIdEditRoute: AuthenticatedMatchesIdEditRoute,
   AuthenticatedMatchesIdResultRoute: AuthenticatedMatchesIdResultRoute,
 }
@@ -381,6 +487,8 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   DisplayMatchCodeRoute: DisplayMatchCodeRoute,
+  BracketsIdDisplayRoute: BracketsIdDisplayRoute,
+  BracketsIdPreviewRoute: BracketsIdPreviewRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
