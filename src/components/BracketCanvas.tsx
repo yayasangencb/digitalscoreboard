@@ -160,8 +160,8 @@ export function BracketCanvas({
     flip: { hidden: { opacity: 0, rotateY: 90 }, show: { opacity: 1, rotateY: 0 } },
   }[boxAnimation];
 
-  const primary = bracket.box_color ?? "hsl(var(--primary))";
-  const accent = "hsl(var(--accent))";
+  const primary = bracket.box_color ?? "var(--primary)";
+  const accent = "var(--accent)";
 
   const championMatch = matches.find((m) => m.round_number === layout.totalRounds);
   const championId = championMatch?.winner_id;
@@ -219,7 +219,7 @@ export function BracketCanvas({
             const isFlow = lineAnimation === "flow";
             const isPulse = lineAnimation === "pulse";
             const isGlow = lineAnimation === "glow";
-            const strokeColor = c.winnerAdvanced ? accent : "hsl(var(--border))";
+            const strokeColor = c.winnerAdvanced ? accent : "var(--border)";
             const strokeWidth = bracket.line_thickness ?? 2;
             return (
               <motion.path
@@ -333,7 +333,7 @@ export function BracketCanvas({
                 width: 120,
               }}
             >
-              <Trophy className="h-12 w-12 text-accent drop-shadow-[0_0_20px_hsl(var(--accent))]" />
+              <Trophy className="h-12 w-12 text-accent drop-shadow-[0_0_20px_var(--accent)]" />
             </motion.div>
           )}
         </AnimatePresence>
