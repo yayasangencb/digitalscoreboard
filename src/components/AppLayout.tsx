@@ -11,6 +11,7 @@ import {
   LogOut,
   Menu,
   X,
+  GitBranch,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useSession } from "@/hooks/useAuth";
@@ -21,6 +22,7 @@ const NAV_ITEMS = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { to: "/matches", label: "Pertandingan Aktif", icon: Trophy },
   { to: "/matches/create", label: "Buat Pertandingan", icon: PlusCircle },
+  { to: "/brackets", label: "Bagan Turnamen", icon: GitBranch },
   { to: "/history", label: "Riwayat Pertandingan", icon: History },
   { to: "/themes", label: "Tema Scoreboard", icon: Palette },
   { to: "/operators", label: "Daftar Operator", icon: Users },
