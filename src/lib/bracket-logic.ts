@@ -112,6 +112,8 @@ export interface LayoutOptions {
   verticalGap?: number;
   paddingX?: number;
   paddingY?: number;
+  symmetric?: boolean;
+  centerGap?: number;
 }
 
 export function computeLayout(participantCount: number, opts: LayoutOptions = {}): BracketLayout {
@@ -127,6 +129,67 @@ export function computeLayout(participantCount: number, opts: LayoutOptions = {}
   const matches = generateSingleElimination(participantCount);
   const firstRoundHeight = (size / 2) * boxHeight + (size / 2 - 1) * verticalGap;
   const nodes: NodeLayout[] = [];
+
+  if (opts.symmetric && rounds >= 2) {
+    // Mirrored bracket: matches whose bracket path reaches semi 0 go left,
+    // matches reaching semi 1 go right, final centered.
+    const centerGap = opts.centerGap ?? boxWidth + roundSpacing;
+    const sideRounds = rounds - 1; // rounds excluding final
+    const totalWidth =
+      paddingX * 2 + sideRounds * boxWidth * 2 + (sideRounds - 1) * roundSpacing * 2 + centerGap + boxWidth;
+    const centerX = totalWidth / 2;
+
+    // Determine side by walking the tree to a semi (round = rounds-1) position.
+    const sideFor = (round: number, pos: number): "left" | "right" => {
+      let p = pos;
+      for (let r = round; r < rounds - 1; r++) p = Math.floor(p / 2);
+      return p === 0 ? "left" : "right";
+    };
+
+    for (const m of matches) {
+      const r = m.round_number;
+      const pos = m.position_in_round;
+      if (r === rounds) {
+        // Final centered
+        nodes.push({
+          matchNumber: m.match_number,
+          round: r,
+          position: pos,
+          x: centerX - boxWidth / 2,
+          y: paddingY + firstRoundHeight / 2 - boxHeight / 2,
+          width: boxWidth,
+          height: boxHeight,
+        });
+        continue;
+      }
+      const side = sideFor(r, pos);
+      const roundMatchesSide = matches.filter(
+        (mm) => mm.round_number === r && sideFor(r, mm.position_in_round) === side,
+      );
+      const idx = roundMatchesSide.findIndex((mm) => mm.match_number === m.match_number);
+      const count = roundMatchesSide.length;
+      const totalH = count * boxHeight + (count - 1) * (verticalGap * Math.pow(2, r - 1));
+      const startY = paddingY + (firstRoundHeight - totalH) / 2;
+      const step = (verticalGap + boxHeight) * Math.pow(2, r - 1);
+      let x: number;
+      if (side === "left") {
+        x = paddingX + (r - 1) * (boxWidth + roundSpacing);
+      } else {
+        x = totalWidth - paddingX - r * boxWidth - (r - 1) * roundSpacing;
+      }
+      nodes.push({
+        matchNumber: m.match_number,
+        round: r,
+        position: pos,
+        x,
+        y: startY + idx * step,
+        width: boxWidth,
+        height: boxHeight,
+      });
+    }
+    const height = paddingY * 2 + firstRoundHeight;
+    return { width: totalWidth, height, boxWidth, boxHeight, nodes, totalRounds: rounds };
+  }
 
   for (let r = 1; r <= rounds; r++) {
     const roundMatches = matches.filter((m) => m.round_number === r);
@@ -150,6 +213,7 @@ export function computeLayout(participantCount: number, opts: LayoutOptions = {}
   const height = paddingY * 2 + firstRoundHeight;
   return { width, height, boxWidth, boxHeight, nodes, totalRounds: rounds };
 }
+
 
 /** Return { p1SlotIdx, p2SlotIdx } for a first-round match position. */
 export function firstRoundSlots(size: number, position: number): [number, number] {
