@@ -10,7 +10,7 @@ import {
   roundName,
 } from "@/lib/bracket-logic";
 import { cn } from "@/lib/utils";
-import bracketBgAsset from "@/assets/bagan-bg.png.asset.json";
+import bracketBgAsset from "@/assets/bagan-bg-v2.png.asset.json";
 
 export interface BracketCanvasProps {
   bracket: BracketRow;
@@ -54,9 +54,12 @@ export function BracketCanvas({
         boxHeight: 74,
         roundSpacing: bracket.round_spacing ?? 100,
         verticalGap: 22,
+        symmetric: bracket.participant_count === 16,
+        centerGap: 260,
       }),
     [bracket.participant_count, bracket.round_spacing],
   );
+
 
   const participantMap = useMemo(() => {
     const m = new Map<string, BracketParticipant>();
@@ -86,9 +89,10 @@ export function BracketCanvas({
       if (!n.match?.next_match_id) return;
       const nextNode = positioned.find((p) => p.match?.id === n.match?.next_match_id);
       if (!nextNode) return;
-      const startX = n.x + n.width;
+      const mirrored = n.x > nextNode.x;
+      const startX = mirrored ? n.x : n.x + n.width;
       const startY = n.y + n.height / 2;
-      const endX = nextNode.x;
+      const endX = mirrored ? nextNode.x + nextNode.width : nextNode.x;
       const endY = nextNode.y + nextNode.height / 2;
       const midX = (startX + endX) / 2;
       const d = `M ${startX} ${startY} H ${midX} V ${endY} H ${endX}`;
