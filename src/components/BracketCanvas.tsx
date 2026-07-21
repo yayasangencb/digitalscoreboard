@@ -54,9 +54,12 @@ export function BracketCanvas({
         boxHeight: 74,
         roundSpacing: bracket.round_spacing ?? 100,
         verticalGap: 22,
+        symmetric: bracket.participant_count === 16,
+        centerGap: 260,
       }),
     [bracket.participant_count, bracket.round_spacing],
   );
+
 
   const participantMap = useMemo(() => {
     const m = new Map<string, BracketParticipant>();
