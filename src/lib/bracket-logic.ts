@@ -4,7 +4,8 @@ export type BracketRow = Tables<"brackets">;
 export type BracketParticipant = Tables<"bracket_participants">;
 export type BracketMatch = Tables<"bracket_matches">;
 
-export const DUMMY_NAMES = ["Ahmad", "Budi", "Candra", "Dimas", "Eko", "Fajar", "Galih", "Hendra"];
+
+
 
 export const PARTICIPANT_PRESETS = [4, 8, 16, 32, 64];
 
