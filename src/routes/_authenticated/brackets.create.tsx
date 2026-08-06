@@ -275,7 +275,7 @@ function CreateBracketPage() {
                 <Button variant="ghost" size="icon" onClick={shufflePeople} title="Acak">
                   <Shuffle className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="icon" onClick={fillDummy} title="Isi dummy">
+                <Button variant="ghost" size="icon" onClick={fillDummy} title="Tambah baris kosong">
                   <Wand2 className="h-4 w-4" />
                 </Button>
                 <Button variant="ghost" size="icon" onClick={resetPeople} title="Reset">
