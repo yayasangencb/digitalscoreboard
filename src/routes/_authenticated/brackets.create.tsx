@@ -252,9 +252,9 @@ function CreateBracketPage() {
                 <Input value={operatorName} onChange={(e) => setOperatorName(e.target.value)} />
               </div>
               <div className="sm:col-span-2">
-                <Label>URL Logo Turnamen</Label>
-                <Input value={logoUrl} onChange={(e) => setLogoUrl(e.target.value)} placeholder="https://…" />
+                <LogoDropzone value={logoUrl} onChange={setLogoUrl} />
               </div>
+
               <div className="sm:col-span-2">
                 <Label>URL Background Bagan</Label>
                 <Input value={backgroundUrl} onChange={(e) => setBackgroundUrl(e.target.value)} placeholder="https://…" />
