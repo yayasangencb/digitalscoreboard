@@ -24,6 +24,8 @@ function EditBracketPage() {
   const { bracket, participants, matches, loading, notFound } = useBracket(id);
   const [selected, setSelected] = useState<BracketMatch | null>(null);
   const [propagateOpen, setPropagateOpen] = useState<{ match: BracketMatch; winnerId: string } | null>(null);
+  const [bulkLoading, setBulkLoading] = useState(false);
+
 
   if (loading) return <AppLayout title="Editor Bagan"><div className="text-muted-foreground">Memuat…</div></AppLayout>;
   if (notFound || !bracket) return <AppLayout title="Editor Bagan"><div>Bagan tidak ditemukan.</div></AppLayout>;
