@@ -87,20 +87,66 @@ function EditBracketPage() {
     window.open(`/controller/${newMatch.match_code}`, "_blank");
   };
 
+  const createAllMatches = async () => {
+    const pending = matches.filter((m) => !m.scoreboard_match_id);
+    if (pending.length === 0) return toast.info("Semua pertandingan sudah terhubung ke scoreboard");
+    setBulkLoading(true);
+    try {
+      const { data: user } = await supabase.auth.getUser();
+      if (!user.user) return;
+      const total = matches.length;
+      const rows = pending.map((m) => {
+        const p1 = getP(m.player_one_id);
+        const p2 = getP(m.player_two_id);
+        return {
+          match_code: `BR-${bracket.name.slice(0, 3).toUpperCase().replace(/\s/g, "")}-${String(m.match_number).padStart(2, "0")}-${Math.random().toString(36).slice(2, 5).toUpperCase()}`,
+          category: bracket.category,
+          round_name: roundName(m.round_number, roundCount(bracket.participant_count)),
+          player_left_name: p1?.name ?? "TBD",
+          player_left_team: p1?.team ?? null,
+          player_right_name: p2?.name ?? "TBD",
+          player_right_team: p2?.team ?? null,
+          table_number: m.table_number ? String(m.table_number) : null,
+          target_score: 11,
+          best_of: 5,
+          created_by: user.user.id,
+        };
+      });
+      const { data: created, error } = await supabase.from("matches").insert(rows).select();
+      if (error || !created) throw error ?? new Error("Gagal membuat pertandingan");
+      await Promise.all(
+        created.map((row, i) =>
+          supabase.from("bracket_matches").update({ scoreboard_match_id: row.id }).eq("id", pending[i].id),
+        ),
+      );
+      await supabase.from("brackets").update({ status: "active" }).eq("id", bracket.id);
+      toast.success(`${created.length} pertandingan dibuat & terhubung ke bagan (total ${total} sampai final)`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Gagal membuat pertandingan");
+    } finally {
+      setBulkLoading(false);
+    }
+  };
+
   return (
     <AppLayout title={`Editor: ${bracket.name}`}>
       <div className="mb-3 flex flex-wrap items-center gap-2">
+        <Button size="sm" onClick={() => void createAllMatches()} disabled={bulkLoading}>
+          <ListPlus className="mr-2 h-4 w-4" />
+          {bulkLoading ? "Membuat…" : "Buat Semua Pertandingan"}
+        </Button>
         <Button variant="secondary" size="sm" asChild>
           <Link to="/brackets/$id/preview" params={{ id: bracket.id }}>
             <Eye className="mr-2 h-4 w-4" /> Preview
           </Link>
         </Button>
-        <Button size="sm" asChild>
+        <Button variant="secondary" size="sm" asChild>
           <Link to="/brackets/$id/display" params={{ id: bracket.id }}>
             <MonitorPlay className="mr-2 h-4 w-4" /> Display
           </Link>
         </Button>
       </div>
+
 
       <div className="grid gap-4 xl:grid-cols-[1fr_320px]">
         <Card className="h-[70vh] overflow-hidden p-0">
