@@ -46,7 +46,18 @@ function EditBracketPage() {
     if (match.next_match_id) {
       const patch = match.next_match_position === "top" ? { player_one_id: winnerId } : { player_two_id: winnerId };
       await supabase.from("bracket_matches").update(patch).eq("id", match.next_match_id);
+      // keep the linked scoreboard match in sync
+      const next = matches.find((m) => m.id === match.next_match_id);
+      const w = getP(winnerId);
+      if (next?.scoreboard_match_id && w) {
+        const sbPatch =
+          match.next_match_position === "top"
+            ? { player_left_name: w.name, player_left_team: w.team }
+            : { player_right_name: w.name, player_right_team: w.team };
+        await supabase.from("matches").update(sbPatch).eq("id", next.scoreboard_match_id);
+      }
     }
+
     setPropagateOpen(null);
     setSelected(null);
     toast.success("Pemenang tersimpan & diteruskan ke babak berikutnya");
