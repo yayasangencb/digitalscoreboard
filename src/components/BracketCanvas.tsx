@@ -269,9 +269,10 @@ export function BracketCanvas({
               key={`node-${n.matchNumber}`}
               initial={animate ? boxVariants.hidden : false}
               animate={boxVariants.show}
+              whileHover={{ scale: 1.04, zIndex: 20 }}
               transition={{ delay: animate ? boxDelay(n.round, idxInRound) : 0, duration: 0.5 / speed, ease: "easeOut" }}
               className={cn(
-                "absolute cursor-pointer rounded-lg border-2 shadow-lg backdrop-blur transition-all",
+                "group absolute cursor-pointer overflow-hidden rounded-lg border-2 shadow-lg backdrop-blur transition-all hover:shadow-2xl",
                 isActive ? "border-accent ring-2 ring-accent" : "border-border/60",
                 isChampion && "border-accent",
               )}
@@ -285,13 +286,37 @@ export function BracketCanvas({
               }}
               onClick={() => m && onMatchClick?.(m)}
             >
-              <div className="flex items-center justify-between px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white/70">
+              {/* shine sweep */}
+              <motion.div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 -skew-x-12 bg-gradient-to-r from-transparent via-white/25 to-transparent"
+                initial={{ x: "-160%" }}
+                animate={{ x: "160%" }}
+                transition={{
+                  duration: 2.2 / speed,
+                  ease: "easeInOut",
+                  repeat: Infinity,
+                  repeatDelay: isActive ? 1.2 : 5 + (idxInRound % 5),
+                  delay: animate ? boxDelay(n.round, idxInRound) + 0.3 : 0,
+                }}
+                style={{ width: "60%" }}
+              />
+              <div className="relative flex items-center justify-between px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white/70">
                 <span>#{m?.match_number}</span>
                 <span className="flex items-center gap-1">
                   {m?.table_number ? `Meja ${m.table_number}` : ""}
-                  {isActive && <span className="rounded bg-accent px-1 text-[9px] text-accent-foreground">LIVE</span>}
+                  {isActive && (
+                    <motion.span
+                      animate={{ opacity: [1, 0.35, 1] }}
+                      transition={{ duration: 1.2, repeat: Infinity }}
+                      className="rounded bg-accent px-1 text-[9px] text-accent-foreground"
+                    >
+                      LIVE
+                    </motion.span>
+                  )}
                 </span>
               </div>
+
               <PlayerRow
                 p={p1}
                 score={m?.score_player_one}
