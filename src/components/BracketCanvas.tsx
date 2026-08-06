@@ -10,7 +10,7 @@ import {
   roundName,
 } from "@/lib/bracket-logic";
 import { cn } from "@/lib/utils";
-import bracketBgAsset from "@/assets/bagan-bg-v2.png.asset.json";
+
 
 export interface BracketCanvasProps {
   bracket: BracketRow;
@@ -172,15 +172,17 @@ export function BracketCanvas({
   const championId = championMatch?.winner_id;
   const champion = championId ? participantMap.get(championId) : null;
 
-  const bgUrl = bracket.background_url ?? bracketBgAsset.url;
+  const bgUrl = bracket.background_url;
 
   return (
-    <div className={cn("relative h-full w-full overflow-hidden", className)}>
-      <div
-        className="pointer-events-none absolute inset-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${bgUrl})` }}
-      />
-      <div className="pointer-events-none absolute inset-0 bg-background/10" />
+    <div className={cn("relative h-full w-full overflow-hidden bg-background", className)}>
+      {bgUrl && (
+        <div
+          className="pointer-events-none absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: `url(${bgUrl})` }}
+        />
+      )}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/10 via-background/60 to-accent/10" />
       <div
         ref={wrapperRef}
         className="absolute origin-top-left transition-transform duration-700 ease-out"

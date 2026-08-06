@@ -10,7 +10,6 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSession } from "@/hooks/useAuth";
 import {
-  DUMMY_NAMES,
   PARTICIPANT_PRESETS,
   assignParticipants,
   bracketSize,
@@ -50,21 +49,20 @@ function CreateBracketPage() {
   const size = bracketSize(participantCount);
 
   const [participants, setParticipants] = useState<Participant[]>(() =>
-    DUMMY_NAMES.slice(0, 8).map((n) => ({ name: n, team: "" })),
+    Array.from({ length: 8 }, () => ({ name: "", team: "" })),
   );
 
   const addPeople = () => setParticipants((p) => [...p, { name: "", team: "" }]);
   const removePeople = (i: number) => setParticipants((p) => p.filter((_, idx) => idx !== i));
   const shufflePeople = () => setParticipants((p) => [...p].sort(() => Math.random() - 0.5));
-  const resetPeople = () => setParticipants(DUMMY_NAMES.slice(0, participantCount).map((n) => ({ name: n, team: "" })));
+  const resetPeople = () =>
+    setParticipants(Array.from({ length: participantCount }, () => ({ name: "", team: "" })));
   const fillDummy = () => {
     const need = participantCount - participants.length;
     if (need <= 0) return;
-    setParticipants((p) => [
-      ...p,
-      ...Array.from({ length: need }, (_, i) => ({ name: DUMMY_NAMES[(p.length + i) % DUMMY_NAMES.length], team: "" })),
-    ]);
+    setParticipants((p) => [...p, ...Array.from({ length: need }, () => ({ name: "", team: "" }))]);
   };
+
 
   const submit = async () => {
     if (!user) return;
@@ -277,7 +275,7 @@ function CreateBracketPage() {
                 <Button variant="ghost" size="icon" onClick={shufflePeople} title="Acak">
                   <Shuffle className="h-4 w-4" />
                 </Button>
-                <Button variant="ghost" size="icon" onClick={fillDummy} title="Isi dummy">
+                <Button variant="ghost" size="icon" onClick={fillDummy} title="Tambah baris kosong">
                   <Wand2 className="h-4 w-4" />
                 </Button>
                 <Button variant="ghost" size="icon" onClick={resetPeople} title="Reset">
