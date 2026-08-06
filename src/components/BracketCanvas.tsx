@@ -50,8 +50,8 @@ export function BracketCanvas({
   const layout = useMemo(
     () =>
       computeLayout(bracket.participant_count, {
-        boxWidth: 220,
-        boxHeight: 74,
+        boxWidth: 230,
+        boxHeight: 94,
         roundSpacing: bracket.round_spacing ?? 100,
         verticalGap: 22,
         symmetric: bracket.participant_count === 16,
@@ -59,6 +59,7 @@ export function BracketCanvas({
       }),
     [bracket.participant_count, bracket.round_spacing],
   );
+
 
 
   const participantMap = useMemo(() => {
@@ -268,9 +269,10 @@ export function BracketCanvas({
               key={`node-${n.matchNumber}`}
               initial={animate ? boxVariants.hidden : false}
               animate={boxVariants.show}
+              whileHover={{ scale: 1.04, zIndex: 20 }}
               transition={{ delay: animate ? boxDelay(n.round, idxInRound) : 0, duration: 0.5 / speed, ease: "easeOut" }}
               className={cn(
-                "absolute cursor-pointer rounded-lg border-2 shadow-lg backdrop-blur transition-all",
+                "group absolute cursor-pointer overflow-hidden rounded-lg border-2 shadow-lg backdrop-blur transition-all hover:shadow-2xl",
                 isActive ? "border-accent ring-2 ring-accent" : "border-border/60",
                 isChampion && "border-accent",
               )}
@@ -284,13 +286,37 @@ export function BracketCanvas({
               }}
               onClick={() => m && onMatchClick?.(m)}
             >
-              <div className="flex items-center justify-between px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white/70">
+              {/* shine sweep */}
+              <motion.div
+                aria-hidden
+                className="pointer-events-none absolute inset-0 -skew-x-12 bg-gradient-to-r from-transparent via-white/25 to-transparent"
+                initial={{ x: "-160%" }}
+                animate={{ x: "160%" }}
+                transition={{
+                  duration: 2.2 / speed,
+                  ease: "easeInOut",
+                  repeat: Infinity,
+                  repeatDelay: isActive ? 1.2 : 5 + (idxInRound % 5),
+                  delay: animate ? boxDelay(n.round, idxInRound) + 0.3 : 0,
+                }}
+                style={{ width: "60%" }}
+              />
+              <div className="relative flex items-center justify-between px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white/70">
                 <span>#{m?.match_number}</span>
                 <span className="flex items-center gap-1">
                   {m?.table_number ? `Meja ${m.table_number}` : ""}
-                  {isActive && <span className="rounded bg-accent px-1 text-[9px] text-accent-foreground">LIVE</span>}
+                  {isActive && (
+                    <motion.span
+                      animate={{ opacity: [1, 0.35, 1] }}
+                      transition={{ duration: 1.2, repeat: Infinity }}
+                      className="rounded bg-accent px-1 text-[9px] text-accent-foreground"
+                    >
+                      LIVE
+                    </motion.span>
+                  )}
                 </span>
               </div>
+
               <PlayerRow
                 p={p1}
                 score={m?.score_player_one}
@@ -338,7 +364,13 @@ export function BracketCanvas({
                 width: 120,
               }}
             >
-              <Trophy className="h-12 w-12 text-accent drop-shadow-[0_0_20px_var(--accent)]" />
+              <motion.div
+                animate={{ y: [0, -8, 0], rotate: [-4, 4, -4] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <Trophy className="h-12 w-12 text-accent drop-shadow-[0_0_20px_var(--accent)]" />
+              </motion.div>
+
             </motion.div>
           )}
         </AnimatePresence>
@@ -365,18 +397,32 @@ function PlayerRow({
   return (
     <div
       className={cn(
-        "flex h-[26px] items-center gap-1.5 px-2 text-xs font-semibold text-white transition-opacity",
+        "flex h-[34px] items-center gap-1.5 px-2 text-xs font-semibold text-white transition-all duration-300",
         loser && "opacity-40",
-        isWinner && "text-accent-foreground",
+        isWinner && "bg-white/10",
       )}
     >
       {showPhoto && p?.photo_url && (
-        <img src={p.photo_url} alt="" className="h-4 w-4 rounded-full object-cover" />
+        <img src={p.photo_url} alt="" className="h-6 w-6 shrink-0 rounded-full object-cover ring-1 ring-white/30" />
       )}
-      <span className="min-w-0 flex-1 truncate">{p?.name ?? <span className="italic text-white/40">TBD</span>}</span>
+      <span className="min-w-0 flex-1 leading-tight">
+        <span className="block truncate">{p?.name ?? <span className="italic text-white/40">TBD</span>}</span>
+        {p?.team && (
+          <span className="block truncate text-[9px] font-bold uppercase tracking-wider text-white/60">{p.team}</span>
+        )}
+      </span>
       {showScore && score != null && (
-        <span className={cn("font-mono text-sm", isWinner ? "text-accent" : "text-white/80")}>{score}</span>
+        <motion.span
+          key={score}
+          initial={{ scale: 1.6, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 300, damping: 18 }}
+          className={cn("font-mono text-sm", isWinner ? "text-accent" : "text-white/80")}
+        >
+          {score}
+        </motion.span>
       )}
     </div>
   );
 }
+
