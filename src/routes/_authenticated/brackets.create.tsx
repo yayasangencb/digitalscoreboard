@@ -10,7 +10,6 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSession } from "@/hooks/useAuth";
 import {
-  DUMMY_NAMES,
   PARTICIPANT_PRESETS,
   assignParticipants,
   bracketSize,
