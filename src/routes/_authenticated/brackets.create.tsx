@@ -50,21 +50,20 @@ function CreateBracketPage() {
   const size = bracketSize(participantCount);
 
   const [participants, setParticipants] = useState<Participant[]>(() =>
-    DUMMY_NAMES.slice(0, 8).map((n) => ({ name: n, team: "" })),
+    Array.from({ length: 8 }, () => ({ name: "", team: "" })),
   );
 
   const addPeople = () => setParticipants((p) => [...p, { name: "", team: "" }]);
   const removePeople = (i: number) => setParticipants((p) => p.filter((_, idx) => idx !== i));
   const shufflePeople = () => setParticipants((p) => [...p].sort(() => Math.random() - 0.5));
-  const resetPeople = () => setParticipants(DUMMY_NAMES.slice(0, participantCount).map((n) => ({ name: n, team: "" })));
+  const resetPeople = () =>
+    setParticipants(Array.from({ length: participantCount }, () => ({ name: "", team: "" })));
   const fillDummy = () => {
     const need = participantCount - participants.length;
     if (need <= 0) return;
-    setParticipants((p) => [
-      ...p,
-      ...Array.from({ length: need }, (_, i) => ({ name: DUMMY_NAMES[(p.length + i) % DUMMY_NAMES.length], team: "" })),
-    ]);
+    setParticipants((p) => [...p, ...Array.from({ length: need }, () => ({ name: "", team: "" }))]);
   };
+
 
   const submit = async () => {
     if (!user) return;
