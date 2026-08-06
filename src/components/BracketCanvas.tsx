@@ -365,18 +365,32 @@ function PlayerRow({
   return (
     <div
       className={cn(
-        "flex h-[26px] items-center gap-1.5 px-2 text-xs font-semibold text-white transition-opacity",
+        "flex h-[34px] items-center gap-1.5 px-2 text-xs font-semibold text-white transition-all duration-300",
         loser && "opacity-40",
-        isWinner && "text-accent-foreground",
+        isWinner && "bg-white/10",
       )}
     >
       {showPhoto && p?.photo_url && (
-        <img src={p.photo_url} alt="" className="h-4 w-4 rounded-full object-cover" />
+        <img src={p.photo_url} alt="" className="h-6 w-6 shrink-0 rounded-full object-cover ring-1 ring-white/30" />
       )}
-      <span className="min-w-0 flex-1 truncate">{p?.name ?? <span className="italic text-white/40">TBD</span>}</span>
+      <span className="min-w-0 flex-1 leading-tight">
+        <span className="block truncate">{p?.name ?? <span className="italic text-white/40">TBD</span>}</span>
+        {p?.team && (
+          <span className="block truncate text-[9px] font-bold uppercase tracking-wider text-white/60">{p.team}</span>
+        )}
+      </span>
       {showScore && score != null && (
-        <span className={cn("font-mono text-sm", isWinner ? "text-accent" : "text-white/80")}>{score}</span>
+        <motion.span
+          key={score}
+          initial={{ scale: 1.6, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 300, damping: 18 }}
+          className={cn("font-mono text-sm", isWinner ? "text-accent" : "text-white/80")}
+        >
+          {score}
+        </motion.span>
       )}
     </div>
   );
 }
+
