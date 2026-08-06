@@ -364,7 +364,13 @@ export function BracketCanvas({
                 width: 120,
               }}
             >
-              <Trophy className="h-12 w-12 text-accent drop-shadow-[0_0_20px_var(--accent)]" />
+              <motion.div
+                animate={{ y: [0, -8, 0], rotate: [-4, 4, -4] }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              >
+                <Trophy className="h-12 w-12 text-accent drop-shadow-[0_0_20px_var(--accent)]" />
+              </motion.div>
+
             </motion.div>
           )}
         </AnimatePresence>
