@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { BracketCanvas } from "@/components/BracketCanvas";
 import { useBracket } from "@/hooks/useBracket";
-import type { BracketMatch } from "@/lib/bracket-logic";
+import { roundCount, roundName, type BracketMatch } from "@/lib/bracket-logic";
 
 export const Route = createFileRoute("/_authenticated/brackets/$id/edit")({
   ssr: false,
