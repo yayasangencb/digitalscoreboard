@@ -10,7 +10,7 @@ import {
   roundName,
 } from "@/lib/bracket-logic";
 import { cn } from "@/lib/utils";
-import bracketBgAsset from "@/assets/bagan-bg-v2.png.asset.json";
+
 
 export interface BracketCanvasProps {
   bracket: BracketRow;
