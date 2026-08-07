@@ -53,7 +53,7 @@ export async function syncMatchToBracket(
     .maybeSingle();
   if (!bm) return false;
 
-  const jobs: Promise<unknown>[] = [];
+  const jobs: PromiseLike<unknown>[] = [];
   if (bm.player_one_id) {
     jobs.push(
       supabase
