@@ -232,6 +232,31 @@ function EditBracketPage() {
                     disabled={!selected.player_two_id}
                   />
                 </div>
+                <div className="grid gap-2 rounded-md border border-border/60 p-2">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Nama & Tim</p>
+                  {[selected.player_one_id, selected.player_two_id].map((pid, i) => {
+                    const p = getP(pid);
+                    if (!p) return null;
+                    return (
+                      <div key={p.id} className="grid grid-cols-2 gap-2">
+                        <div>
+                          <Label>{i === 0 ? "Pemain A" : "Pemain B"}</Label>
+                          <Input
+                            defaultValue={p.name}
+                            onBlur={(e) => void updateParticipant(p.id, { name: e.target.value.trim() || p.name })}
+                          />
+                        </div>
+                        <div>
+                          <Label>Tim</Label>
+                          <Input
+                            defaultValue={p.team ?? ""}
+                            onBlur={(e) => void updateParticipant(p.id, { team: e.target.value.trim() || null })}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
                     <Label>Skor A</Label>
