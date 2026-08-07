@@ -68,6 +68,13 @@ function EditBracketPage() {
     if (error) toast.error(error.message);
   };
 
+  const updateParticipant = async (pid: string, patch: { name?: string; team?: string | null }) => {
+    const { error } = await supabase.from("bracket_participants").update(patch).eq("id", pid);
+    if (error) return toast.error(error.message);
+    await syncParticipantToMatches(pid);
+    toast.success("Peserta diperbarui & pertandingan tersinkron");
+  };
+
   const openScoreboard = async (m: BracketMatch) => {
     // Create a scoreboard match or open existing
     if (m.scoreboard_match_id) {
