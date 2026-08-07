@@ -72,12 +72,22 @@ function EditMatchPage() {
         notes: match.notes,
       })
       .eq("id", match.id);
-    setBusy(false);
     if (error) {
+      setBusy(false);
       toast.error(error.message);
       return;
     }
-    toast.success("Pertandingan diperbarui");
+    // jika pertandingan ini terhubung ke bagan, perbarui peserta bagan juga
+    const linked = await syncMatchToBracket(match.id, {
+      player_left_name: match.player_left_name,
+      player_left_team: match.player_left_team,
+      player_left_photo: match.player_left_photo,
+      player_right_name: match.player_right_name,
+      player_right_team: match.player_right_team,
+      player_right_photo: match.player_right_photo,
+    });
+    setBusy(false);
+    toast.success(linked ? "Pertandingan diperbarui & bagan tersinkron" : "Pertandingan diperbarui");
     navigate({ to: "/matches" });
   };
 
