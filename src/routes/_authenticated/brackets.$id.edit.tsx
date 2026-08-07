@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { BracketCanvas } from "@/components/BracketCanvas";
 import { useBracket } from "@/hooks/useBracket";
 import { roundCount, roundName, type BracketMatch } from "@/lib/bracket-logic";
+import { syncParticipantToMatches } from "@/lib/bracket-sync";
 
 export const Route = createFileRoute("/_authenticated/brackets/$id/edit")({
   ssr: false,
