@@ -12,6 +12,7 @@ import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "
 import { BracketCanvas } from "@/components/BracketCanvas";
 import { useBracket } from "@/hooks/useBracket";
 import { roundCount, roundName, type BracketMatch } from "@/lib/bracket-logic";
+import { syncParticipantToMatches } from "@/lib/bracket-sync";
 
 export const Route = createFileRoute("/_authenticated/brackets/$id/edit")({
   ssr: false,
@@ -66,6 +67,13 @@ function EditBracketPage() {
   const updateMatch = async (id: string, patch: Partial<BracketMatch>) => {
     const { error } = await supabase.from("bracket_matches").update(patch).eq("id", id);
     if (error) toast.error(error.message);
+  };
+
+  const updateParticipant = async (pid: string, patch: { name?: string; team?: string | null }) => {
+    const { error } = await supabase.from("bracket_participants").update(patch).eq("id", pid);
+    if (error) return toast.error(error.message);
+    await syncParticipantToMatches(pid);
+    toast.success("Peserta diperbarui & pertandingan tersinkron");
   };
 
   const openScoreboard = async (m: BracketMatch) => {
@@ -231,6 +239,31 @@ function EditBracketPage() {
                     onWin={() => selected.player_two_id && setPropagateOpen({ match: selected, winnerId: selected.player_two_id })}
                     disabled={!selected.player_two_id}
                   />
+                </div>
+                <div className="grid gap-2 rounded-md border border-border/60 p-2">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Nama & Tim</p>
+                  {[selected.player_one_id, selected.player_two_id].map((pid, i) => {
+                    const p = getP(pid);
+                    if (!p) return null;
+                    return (
+                      <div key={p.id} className="grid grid-cols-2 gap-2">
+                        <div>
+                          <Label>{i === 0 ? "Pemain A" : "Pemain B"}</Label>
+                          <Input
+                            defaultValue={p.name}
+                            onBlur={(e) => void updateParticipant(p.id, { name: e.target.value.trim() || p.name })}
+                          />
+                        </div>
+                        <div>
+                          <Label>Tim</Label>
+                          <Input
+                            defaultValue={p.team ?? ""}
+                            onBlur={(e) => void updateParticipant(p.id, { team: e.target.value.trim() || null })}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div>
