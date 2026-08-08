@@ -172,16 +172,23 @@ export async function reconcileBracketProgression(bracketId: string, depth = 0) 
   if (!matches || matches.length === 0) return;
 
   const partMap = new Map(participants?.map((p) => [p.id, p]) ?? []);
+
+  // Batch query semua scoreboard matches sekaligus (hanya 1 query, bukan puluhan query)
+  const sbIds = matches.map((m) => m.scoreboard_match_id).filter(Boolean) as string[];
+  const { data: sbMatches } = sbIds.length
+    ? await supabase
+        .from("matches")
+        .select("id, sets_left, sets_right, match_status, winner, player_left_name, player_right_name")
+        .in("id", sbIds)
+    : { data: [] };
+
+  const sbMap = new Map(sbMatches?.map((s) => [s.id, s]) ?? []);
   let changed = false;
 
   for (const m of matches) {
     // 1. Jika terhubung ke scoreboard match, perbarui skor dan winner_id jika pertandingan telah selesai/berlangsung
     if (m.scoreboard_match_id) {
-      const { data: sbMatch } = await supabase
-        .from("matches")
-        .select("id, sets_left, sets_right, match_status, winner, player_left_name, player_right_name")
-        .eq("id", m.scoreboard_match_id)
-        .maybeSingle();
+      const sbMatch = sbMap.get(m.scoreboard_match_id);
 
       if (sbMatch) {
         const finished = sbMatch.match_status === "finished";
@@ -277,5 +284,6 @@ export async function reconcileBracketProgression(bracketId: string, depth = 0) 
     await reconcileBracketProgression(bracketId, depth + 1);
   }
 }
+
 
 

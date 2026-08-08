@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { Expand, Shrink } from "lucide-react";
+import { Expand, Radio, Shrink } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { BracketCanvas } from "@/components/BracketCanvas";
 import { useBracket } from "@/hooks/useBracket";
-import { roundCount } from "@/lib/bracket-logic";
+import { roundCount, type BracketMatch } from "@/lib/bracket-logic";
 import { useAutoHideCursor } from "@/components/MatchDialogs";
 import { cn } from "@/lib/utils";
 
@@ -27,6 +28,7 @@ function DisplayBracketPage() {
   const [playing, setPlaying] = useState(true);
   const [key, setKey] = useState(0);
   const [focusRound, setFocusRound] = useState<number | null>(null);
+  const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
   const cursorHidden = useAutoHideCursor(isFs);
 
   useEffect(() => {
@@ -61,7 +63,19 @@ function DisplayBracketPage() {
   if (loading) return <div className="flex min-h-screen items-center justify-center text-muted-foreground">Memuat…</div>;
   if (notFound || !bracket) return <div className="flex min-h-screen items-center justify-center">Bagan tidak ditemukan.</div>;
 
-  const activeMatch = matches.find((m) => m.match_status === "in_progress");
+  const inProgressMatch = matches.find((m) => m.match_status === "in_progress");
+  const activeMatchId = selectedMatchId ?? inProgressMatch?.id ?? null;
+  const activeMatchObj = matches.find((m) => m.id === activeMatchId);
+
+  const handleMatchClick = (m: BracketMatch) => {
+    if (selectedMatchId === m.id) {
+      setSelectedMatchId(null);
+      toast.info("Pilihan pertandingan LIVE direset");
+    } else {
+      setSelectedMatchId(m.id);
+      toast.success(`Pertandingan #${m.match_number} dipilih sebagai LIVE`);
+    }
+  };
 
   return (
     <div className={cn("relative h-screen w-screen overflow-hidden bg-background", cursorHidden && "cursor-hidden")}>
@@ -75,7 +89,8 @@ function DisplayBracketPage() {
           animationKey={key}
           autoTour={autoTour}
           focusRound={focusRound}
-          activeMatchId={activeMatch?.id ?? null}
+          activeMatchId={activeMatchId}
+          onMatchClick={handleMatchClick}
         />
       </div>
 
@@ -91,6 +106,14 @@ function DisplayBracketPage() {
           <div className="truncate font-display text-2xl font-black uppercase tracking-wide">{bracket.name}</div>
           <div className="truncate text-sm text-muted-foreground">{bracket.category}</div>
         </div>
+
+        {activeMatchObj && (
+          <div className="flex items-center gap-2 rounded-full border border-accent/60 bg-black/60 px-3 py-1 text-xs font-semibold text-accent backdrop-blur">
+            <Radio className="h-4 w-4 animate-pulse" />
+            <span>LIVE: Pertandingan #{activeMatchObj.match_number}</span>
+          </div>
+        )}
+
         <Button variant="ghost" size="icon" onClick={toggleFs} title="Fullscreen (F)">
           {isFs ? <Shrink className="h-4 w-4" /> : <Expand className="h-4 w-4" />}
         </Button>
@@ -103,8 +126,9 @@ function DisplayBracketPage() {
           isFs && cursorHidden ? "opacity-0" : "opacity-100",
         )}
       >
-        Space Play/Pause · R Restart · A Auto-Tour · ← → Fokus Babak · F Fullscreen
+        Klik Kotak: Pilih LIVE · Space: Play/Pause · R: Restart · A: Auto-Tour · ← →: Fokus Babak · F: Fullscreen
       </div>
     </div>
   );
 }
+

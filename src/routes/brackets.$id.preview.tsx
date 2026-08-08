@@ -37,6 +37,7 @@ function PreviewPage() {
   const [boxAnim, setBoxAnim] = useState<"fade" | "slide" | "zoom" | "flip">("slide");
   const [lineAnim, setLineAnim] = useState<"draw" | "flow" | "pulse" | "glow" | "static">("draw");
   const [focusRound, setFocusRound] = useState<number | null>(null);
+  const [selectedMatchId, setSelectedMatchId] = useState<string | null>(null);
 
   if (loading)
     return (
@@ -46,13 +47,15 @@ function PreviewPage() {
     return <div className="flex min-h-screen items-center justify-center">Bagan tidak ditemukan.</div>;
 
   const rounds = roundCount(bracket.participant_count);
+  const inProgressMatch = matches.find((m) => m.match_status === "in_progress");
+  const activeMatchId = selectedMatchId ?? inProgressMatch?.id ?? null;
 
   return (
     <div className="min-h-screen bg-background p-4">
       <div className="mb-4 flex flex-wrap items-center gap-2 rounded-lg border border-border bg-card p-3">
         <div className="mr-auto">
           <div className="font-display text-sm font-bold uppercase">{bracket.name}</div>
-          <div className="text-xs text-muted-foreground">Preview Bagan</div>
+          <div className="text-xs text-muted-foreground">Preview Bagan (Klik kotak pertandingan untuk highlight LIVE)</div>
         </div>
         <Select value={vp.id} onChange={(e) => setVp(VIEWPORTS.find((v) => v.id === e.target.value) ?? VIEWPORTS[0])} className="w-auto">
           {VIEWPORTS.map((v) => (
@@ -134,9 +137,12 @@ function PreviewPage() {
             boxAnimation={boxAnim}
             lineAnimation={lineAnim}
             focusRound={focusRound}
+            activeMatchId={activeMatchId}
+            onMatchClick={(m) => setSelectedMatchId(m.id === selectedMatchId ? null : m.id)}
           />
         </div>
       </div>
     </div>
   );
 }
+
