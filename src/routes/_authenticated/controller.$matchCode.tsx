@@ -46,7 +46,7 @@ function ControllerPage() {
   const actions = useMatchActions(match, setMatch);
   const clock = useMatchClock(match);
 
-  const [muted, setMutedState] = useState(true);
+  const [muted, setMutedState] = useState(false);
   const [confirm, setConfirm] = useState<null | "reset" | "cancelSet" | "finish">(null);
   const [overlayDismissed, setOverlayDismissed] = useState(false);
   const [setDialogDismissKey, setSetDialogDismissKey] = useState("");

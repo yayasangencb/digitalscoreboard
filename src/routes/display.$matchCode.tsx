@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Expand, Keyboard, Shrink } from "lucide-react";
+import { Expand, Keyboard, Shrink, Volume2, VolumeX } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Scoreboard } from "@/components/Scoreboard";
 import {
@@ -17,6 +17,7 @@ import { useMatchClock } from "@/hooks/useMatchClock";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { useSession } from "@/hooks/useAuth";
 import { checkSetWinner } from "@/lib/match-logic";
+import { isMuted, setMuted } from "@/lib/sounds";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/display/$matchCode")({
@@ -43,7 +44,10 @@ function DisplayPage() {
   const [confirmReset, setConfirmReset] = useState(false);
   const [overlayDismissed, setOverlayDismissed] = useState(false);
   const [setDialogDismissKey, setSetDialogDismissKey] = useState("");
+  const [muted, setMutedState] = useState(false);
   const cursorHidden = useAutoHideCursor(isFs);
+
+  useEffect(() => setMutedState(isMuted()), []);
 
   useEffect(() => {
     const onFs = () => setIsFs(!!document.fullscreenElement);
@@ -127,6 +131,18 @@ function DisplayPage() {
         )}
       >
         <ConnectionBadge status={connStatus} />
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => {
+            const next = !muted;
+            setMuted(next);
+            setMutedState(next);
+          }}
+          title={muted ? "Aktifkan suara" : "Matikan suara"}
+        >
+          {muted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+        </Button>
         {canControl && (
           <Button variant="ghost" size="icon" onClick={() => setHelpOpen(true)} title="Shortcut keyboard (H)">
             <Keyboard className="h-4 w-4" />
