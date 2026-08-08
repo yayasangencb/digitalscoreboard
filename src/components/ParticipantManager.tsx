@@ -123,7 +123,12 @@ export function ParticipantManager({ bracketId, participants, matches, onChanged
         }
         await supabase.from("bracket_matches").update(patch).eq("id", m.id);
         if (m.scoreboard_match_id) {
-          const sb: Record<string, string | null> = {};
+          const sb: {
+            player_left_name?: string;
+            player_left_team?: string | null;
+            player_right_name?: string;
+            player_right_team?: string | null;
+          } = {};
           if (m.player_one_id === p.id) {
             sb.player_left_name = "TBD";
             sb.player_left_team = null;
@@ -134,6 +139,7 @@ export function ParticipantManager({ bracketId, participants, matches, onChanged
           }
           if (Object.keys(sb).length) await supabase.from("matches").update(sb).eq("id", m.scoreboard_match_id);
         }
+
       }
       const { error } = await supabase.from("bracket_participants").delete().eq("id", p.id);
       if (error) throw error;
