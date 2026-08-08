@@ -156,7 +156,9 @@ export async function syncScoreboardMatchToBracket(matchId: string) {
  * Sangat berguna untuk skenario ganjil (seperti 3 tim: A vs B, C menunggu)
  * di mana pemenang A vs B otomatis mengisi slot babak berikutnya menggantikan TBD.
  */
-export async function reconcileBracketProgression(bracketId: string) {
+export async function reconcileBracketProgression(bracketId: string, depth = 0) {
+  if (depth > 10) return;
+
   const [{ data: matches }, { data: participants }] = await Promise.all([
     supabase
       .from("bracket_matches")
@@ -272,7 +274,8 @@ export async function reconcileBracketProgression(bracketId: string) {
   }
 
   if (changed) {
-    await reconcileBracketProgression(bracketId);
+    await reconcileBracketProgression(bracketId, depth + 1);
   }
 }
+
 
