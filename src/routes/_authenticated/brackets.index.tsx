@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Eye, MonitorPlay, PencilLine, Plus, Trash2, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { deleteBracketCascade } from "@/lib/bracket-sync";
 import { AppLayout } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -24,10 +25,10 @@ function BracketListPage() {
   });
 
   const remove = async (id: string) => {
-    if (!confirm("Hapus bagan ini? Semua peserta dan pertandingan akan ikut terhapus.")) return;
-    const { error } = await supabase.from("brackets").delete().eq("id", id);
+    if (!confirm("Hapus bagan ini? Semua peserta dan pertandingan scoreboard yang terhubung akan ikut terhapus.")) return;
+    const { error } = await deleteBracketCascade(id);
     if (error) return toast.error(error.message);
-    toast.success("Bagan dihapus");
+    toast.success("Bagan & pertandingan terhubung dihapus");
     void refetch();
   };
 

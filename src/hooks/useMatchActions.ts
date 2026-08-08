@@ -14,6 +14,7 @@ import {
   type Snapshot,
 } from "@/lib/match-logic";
 import { playScore, playScoreMinus, playSetWon, playMatchWon } from "@/lib/sounds";
+import { syncScoreboardMatchToBracket } from "@/lib/bracket-sync";
 
 type Patch = Partial<MatchRow>;
 
@@ -172,7 +173,7 @@ export function useMatchActions(match: MatchRow | null, setMatch: (m: MatchRow) 
     const mw = matchWinner(setsLeft, setsRight, m.best_of);
     if (mw) {
       playMatchWon();
-      void update(
+      await update(
         {
           sets_left: setsLeft,
           sets_right: setsRight,
@@ -186,6 +187,7 @@ export function useMatchActions(match: MatchRow | null, setMatch: (m: MatchRow) 
         },
         { action: "match_finished" },
       );
+      await syncScoreboardMatchToBracket(m.id);
       return "match_finished";
     }
     playSetWon();
@@ -251,8 +253,9 @@ export function useMatchActions(match: MatchRow | null, setMatch: (m: MatchRow) 
         timer_elapsed: Math.floor(timerElapsedSeconds(m)),
       },
       { action: "match_finished_manual" },
-    );
+    ).then(() => syncScoreboardMatchToBracket(m.id));
   }, [update]);
+
 
   const pauseMatch = useCallback(() => {
     const m = matchRef.current;
