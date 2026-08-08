@@ -230,8 +230,13 @@ export async function reconcileBracketProgression(bracketId: string, depth = 0) 
       }
     }
 
-    // 2. BYE check: Jika hanya 1 peserta di babak ini (peserta lain null) dan match belum finished
-    if (!m.winner_id && ((m.player_one_id && !m.player_two_id) || (!m.player_one_id && m.player_two_id))) {
+    // 2. BYE check: HANYA untuk Babak 1 (round_number === 1) di mana slot lawan kosong pada seeding awal.
+    // Babak 2 ke atas (round_number > 1) menunggu pemenang dari babak sebelumnya, TIDAK BOLEH di-BYE kan otomatis!
+    if (
+      m.round_number === 1 &&
+      !m.winner_id &&
+      ((m.player_one_id && !m.player_two_id) || (!m.player_one_id && m.player_two_id))
+    ) {
       const byeWinner = m.player_one_id ?? m.player_two_id;
       if (byeWinner) {
         m.winner_id = byeWinner;
