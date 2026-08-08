@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Eye, MonitorPlay, PencilLine, Plus, Trash2, Trophy } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { deleteBracketCascade } from "@/lib/bracket-sync";
 import { AppLayout } from "@/components/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
