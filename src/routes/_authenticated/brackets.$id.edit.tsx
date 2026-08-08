@@ -24,7 +24,7 @@ export const Route = createFileRoute("/_authenticated/brackets/$id/edit")({
 
 function EditBracketPage() {
   const { id } = Route.useParams();
-  const { bracket, participants, matches, loading, notFound } = useBracket(id);
+  const { bracket, participants, matches, loading, notFound, reload } = useBracket(id);
   const [selected, setSelected] = useState<BracketMatch | null>(null);
   const [propagateOpen, setPropagateOpen] = useState<{ match: BracketMatch; winnerId: string } | null>(null);
   const [bulkLoading, setBulkLoading] = useState(false);
