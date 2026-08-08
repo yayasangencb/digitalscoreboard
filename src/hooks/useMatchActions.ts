@@ -14,6 +14,7 @@ import {
   type Snapshot,
 } from "@/lib/match-logic";
 import { playScore, playScoreMinus, playSetWon, playMatchWon } from "@/lib/sounds";
+import { syncScoreboardMatchToBracket } from "@/lib/bracket-sync";
 
 type Patch = Partial<MatchRow>;
 
@@ -186,6 +187,7 @@ export function useMatchActions(match: MatchRow | null, setMatch: (m: MatchRow) 
         },
         { action: "match_finished" },
       );
+      void syncScoreboardMatchToBracket(m.id);
       return "match_finished";
     }
     playSetWon();
