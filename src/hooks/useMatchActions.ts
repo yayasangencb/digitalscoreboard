@@ -157,13 +157,24 @@ export function useMatchActions(match: MatchRow | null, setMatch: (m: MatchRow) 
       return null;
     }
     const setNumber = m.sets_left + m.sets_right + 1;
-    const { error } = await supabase.from("match_sets").insert({
-      match_id: m.id,
-      set_number: setNumber,
-      score_left: m.score_left,
-      score_right: m.score_right,
-      winner,
-    });
+
+    // Clean up any existing orphaned set_number >= setNumber (e.g. from previous undone sets)
+    await supabase
+      .from("match_sets")
+      .delete()
+      .eq("match_id", m.id)
+      .gte("set_number", setNumber);
+
+    const { error } = await supabase.from("match_sets").upsert(
+      {
+        match_id: m.id,
+        set_number: setNumber,
+        score_left: m.score_left,
+        score_right: m.score_right,
+        winner,
+      },
+      { onConflict: "match_id, set_number" },
+    );
     if (error) {
       toast.error("Gagal menyimpan set: " + error.message);
       return null;
@@ -219,7 +230,7 @@ export function useMatchActions(match: MatchRow | null, setMatch: (m: MatchRow) 
       return;
     }
     await supabase.from("match_sets").delete().eq("id", last.id);
-    void update(
+    await update(
       {
         score_left: last.score_left,
         score_right: last.score_right,
@@ -231,6 +242,7 @@ export function useMatchActions(match: MatchRow | null, setMatch: (m: MatchRow) 
       },
       { action: "set_cancelled" },
     );
+    await syncScoreboardMatchToBracket(m.id);
     toast.success(`Set ${last.set_number} dibatalkan`);
   }, [update]);
 
@@ -295,12 +307,27 @@ export function useMatchActions(match: MatchRow | null, setMatch: (m: MatchRow) 
   }, [update]);
 
   // ----- Undo / Redo -----
-  const undo = useCallback(() => {
+  const undo = useCallback(async () => {
     const m = matchRef.current;
     const snap = undoStack.current.pop();
     if (!m || !snap) return;
     redoStack.current.push(takeSnapshot(m));
-    void update(snap as Patch, { snapshot: false, action: "undo" });
+
+    const snapSets = (snap.sets_left ?? 0) + (snap.sets_right ?? 0);
+    const curSets = m.sets_left + m.sets_right;
+
+    if (snapSets < curSets) {
+      await supabase
+        .from("match_sets")
+        .delete()
+        .eq("match_id", m.id)
+        .gte("set_number", snapSets + 1);
+    }
+
+    await update(snap as Patch, { snapshot: false, action: "undo" });
+    if (snap.match_status !== "finished") {
+      await syncScoreboardMatchToBracket(m.id);
+    }
   }, [update]);
 
   const redo = useCallback(() => {
