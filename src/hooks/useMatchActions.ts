@@ -253,8 +253,9 @@ export function useMatchActions(match: MatchRow | null, setMatch: (m: MatchRow) 
         timer_elapsed: Math.floor(timerElapsedSeconds(m)),
       },
       { action: "match_finished_manual" },
-    );
+    ).then(() => syncScoreboardMatchToBracket(m.id));
   }, [update]);
+
 
   const pauseMatch = useCallback(() => {
     const m = matchRef.current;
