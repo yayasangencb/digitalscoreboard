@@ -222,6 +222,15 @@ function EditBracketPage() {
             </CardContent>
           </Card>
 
+          <ParticipantManager
+            bracketId={bracket.id}
+            participants={participants}
+            matches={matches}
+            onChanged={() => void reload()}
+          />
+
+
+
           {selected && (
             <Card>
               <CardHeader>
