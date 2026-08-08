@@ -13,7 +13,7 @@ import { BracketCanvas } from "@/components/BracketCanvas";
 import { ParticipantManager } from "@/components/ParticipantManager";
 import { useBracket } from "@/hooks/useBracket";
 import { roundCount, roundName, type BracketMatch } from "@/lib/bracket-logic";
-import { syncParticipantToMatches } from "@/lib/bracket-sync";
+import { reconcileBracketProgression, syncParticipantToMatches } from "@/lib/bracket-sync";
 
 
 export const Route = createFileRoute("/_authenticated/brackets/$id/edit")({
@@ -46,20 +46,18 @@ function EditBracketPage() {
       .from("bracket_matches")
       .update({ winner_id: winnerId, match_status: "finished" })
       .eq("id", match.id);
-    if (match.next_match_id) {
-      const patch = match.next_match_position === "top" ? { player_one_id: winnerId } : { player_two_id: winnerId };
-      await supabase.from("bracket_matches").update(patch).eq("id", match.next_match_id);
-      // keep the linked scoreboard match in sync
-      const next = matches.find((m) => m.id === match.next_match_id);
+
+    if (match.scoreboard_match_id) {
       const w = getP(winnerId);
-      if (next?.scoreboard_match_id && w) {
-        const sbPatch =
-          match.next_match_position === "top"
-            ? { player_left_name: w.name, player_left_team: w.team }
-            : { player_right_name: w.name, player_right_team: w.team };
-        await supabase.from("matches").update(sbPatch).eq("id", next.scoreboard_match_id);
+      if (w) {
+        await supabase
+          .from("matches")
+          .update({ match_status: "finished", winner: w.name })
+          .eq("id", match.scoreboard_match_id);
       }
     }
+
+    await reconcileBracketProgression(bracket.id);
 
     setPropagateOpen(null);
     setSelected(null);
@@ -81,6 +79,17 @@ function EditBracketPage() {
   const openScoreboard = async (m: BracketMatch) => {
     // Create a scoreboard match or open existing
     if (m.scoreboard_match_id) {
+      const p1 = getP(m.player_one_id);
+      const p2 = getP(m.player_two_id);
+      if (p1 || p2) {
+        await supabase
+          .from("matches")
+          .update({
+            ...(p1 ? { player_left_name: p1.name, player_left_team: p1.team, player_left_photo: p1.photo_url } : {}),
+            ...(p2 ? { player_right_name: p2.name, player_right_team: p2.team, player_right_photo: p2.photo_url } : {}),
+          })
+          .eq("id", m.scoreboard_match_id);
+      }
       window.open(`/controller/${m.scoreboard_match_id}`, "_blank");
       return;
     }
@@ -96,8 +105,10 @@ function EditBracketPage() {
         match_code: code,
         player_left_name: p1.name,
         player_left_team: p1.team,
+        player_left_photo: p1.photo_url,
         player_right_name: p2.name,
         player_right_team: p2.team,
+        player_right_photo: p2.photo_url,
         target_score: 11,
         best_of: 5,
         table_number: m.table_number ? String(m.table_number) : null,

@@ -112,7 +112,7 @@ export async function deleteBracketCascade(bracketId: string) {
 export async function syncScoreboardMatchToBracket(matchId: string) {
   const { data: m } = await supabase
     .from("matches")
-    .select("id, sets_left, sets_right, match_status")
+    .select("id, sets_left, sets_right, match_status, winner, player_left_name, player_right_name")
     .eq("id", matchId)
     .maybeSingle();
   if (!m) return;
@@ -125,12 +125,16 @@ export async function syncScoreboardMatchToBracket(matchId: string) {
   if (!bm) return;
 
   const finished = m.match_status === "finished";
-  const winnerId =
-    finished && m.sets_left !== m.sets_right
-      ? m.sets_left > m.sets_right
-        ? bm.player_one_id
-        : bm.player_two_id
-      : null;
+  let winnerId: string | null = null;
+  if (finished) {
+    if (m.winner) {
+      if (m.winner === m.player_left_name) winnerId = bm.player_one_id;
+      else if (m.winner === m.player_right_name) winnerId = bm.player_two_id;
+    }
+    if (!winnerId && m.sets_left !== m.sets_right) {
+      winnerId = m.sets_left > m.sets_right ? bm.player_one_id : bm.player_two_id;
+    }
+  }
 
   await supabase
     .from("bracket_matches")
@@ -142,25 +146,133 @@ export async function syncScoreboardMatchToBracket(matchId: string) {
     })
     .eq("id", bm.id);
 
-  if (!finished || !winnerId || !bm.next_match_id) return;
-
-  const patch =
-    bm.next_match_position === "top" ? { player_one_id: winnerId } : { player_two_id: winnerId };
-  await supabase.from("bracket_matches").update(patch).eq("id", bm.next_match_id);
-
-  // teruskan nama pemenang ke scoreboard babak berikutnya (jika sudah dibuat)
-  const [{ data: winner }, { data: next }] = await Promise.all([
-    supabase.from("bracket_participants").select("name, team, photo_url").eq("id", winnerId).maybeSingle(),
-    supabase.from("bracket_matches").select("scoreboard_match_id").eq("id", bm.next_match_id).maybeSingle(),
-  ]);
-  if (winner && next?.scoreboard_match_id) {
-    await supabase
-      .from("matches")
-      .update(
-        bm.next_match_position === "top"
-          ? { player_left_name: winner.name, player_left_team: winner.team, player_left_photo: winner.photo_url }
-          : { player_right_name: winner.name, player_right_team: winner.team, player_right_photo: winner.photo_url },
-      )
-      .eq("id", next.scoreboard_match_id);
+  if (bm.bracket_id) {
+    await reconcileBracketProgression(bm.bracket_id);
   }
 }
+
+/**
+ * Rekonsiliasi seluruh bagan untuk auto-advance BYE dan pemenang pertandingan aktif.
+ * Sangat berguna untuk skenario ganjil (seperti 3 tim: A vs B, C menunggu)
+ * di mana pemenang A vs B otomatis mengisi slot babak berikutnya menggantikan TBD.
+ */
+export async function reconcileBracketProgression(bracketId: string) {
+  const [{ data: matches }, { data: participants }] = await Promise.all([
+    supabase
+      .from("bracket_matches")
+      .select("*")
+      .eq("bracket_id", bracketId)
+      .order("round_number", { ascending: true })
+      .order("match_number", { ascending: true }),
+    supabase.from("bracket_participants").select("*").eq("bracket_id", bracketId),
+  ]);
+
+  if (!matches || matches.length === 0) return;
+
+  const partMap = new Map(participants?.map((p) => [p.id, p]) ?? []);
+  let changed = false;
+
+  for (const m of matches) {
+    // 1. Jika terhubung ke scoreboard match, perbarui skor dan winner_id jika pertandingan telah selesai/berlangsung
+    if (m.scoreboard_match_id) {
+      const { data: sbMatch } = await supabase
+        .from("matches")
+        .select("id, sets_left, sets_right, match_status, winner, player_left_name, player_right_name")
+        .eq("id", m.scoreboard_match_id)
+        .maybeSingle();
+
+      if (sbMatch) {
+        const finished = sbMatch.match_status === "finished";
+        let winnerId: string | null = null;
+        if (finished) {
+          if (sbMatch.winner) {
+            if (sbMatch.winner === sbMatch.player_left_name) winnerId = m.player_one_id;
+            else if (sbMatch.winner === sbMatch.player_right_name) winnerId = m.player_two_id;
+          }
+          if (!winnerId && sbMatch.sets_left !== sbMatch.sets_right) {
+            winnerId = sbMatch.sets_left > sbMatch.sets_right ? m.player_one_id : m.player_two_id;
+          }
+        }
+
+        const nextStatus = finished ? "finished" : sbMatch.match_status === "in_progress" ? "in_progress" : m.match_status;
+        if (
+          m.score_player_one !== sbMatch.sets_left ||
+          m.score_player_two !== sbMatch.sets_right ||
+          m.winner_id !== winnerId ||
+          m.match_status !== nextStatus
+        ) {
+          m.score_player_one = sbMatch.sets_left;
+          m.score_player_two = sbMatch.sets_right;
+          m.winner_id = winnerId;
+          m.match_status = nextStatus;
+
+          await supabase
+            .from("bracket_matches")
+            .update({
+              score_player_one: m.score_player_one,
+              score_player_two: m.score_player_two,
+              winner_id: m.winner_id,
+              match_status: m.match_status,
+            })
+            .eq("id", m.id);
+
+          changed = true;
+        }
+      }
+    }
+
+    // 2. BYE check: Jika hanya 1 peserta di babak ini (peserta lain null) dan match belum finished
+    if (!m.winner_id && ((m.player_one_id && !m.player_two_id) || (!m.player_one_id && m.player_two_id))) {
+      const byeWinner = m.player_one_id ?? m.player_two_id;
+      if (byeWinner) {
+        m.winner_id = byeWinner;
+        m.match_status = "finished";
+        await supabase
+          .from("bracket_matches")
+          .update({ winner_id: byeWinner, match_status: "finished" })
+          .eq("id", m.id);
+        changed = true;
+      }
+    }
+
+    // 3. Teruskan pemenang ke babak berikutnya (next_match_id)
+    if (m.winner_id && m.next_match_id) {
+      const nextM = matches.find((nm) => nm.id === m.next_match_id);
+      if (nextM) {
+        const isTop = m.next_match_position === "top";
+        const currentTargetId = isTop ? nextM.player_one_id : nextM.player_two_id;
+        if (currentTargetId !== m.winner_id) {
+          if (isTop) nextM.player_one_id = m.winner_id;
+          else nextM.player_two_id = m.winner_id;
+
+          await supabase
+            .from("bracket_matches")
+            .update(isTop ? { player_one_id: m.winner_id } : { player_two_id: m.winner_id })
+            .eq("id", nextM.id);
+
+          changed = true;
+
+          // Jika pertandingan babak berikutnya sudah punya scoreboard match, update nama pemainnya
+          if (nextM.scoreboard_match_id) {
+            const winner = partMap.get(m.winner_id);
+            if (winner) {
+              await supabase
+                .from("matches")
+                .update(
+                  isTop
+                    ? { player_left_name: winner.name, player_left_team: winner.team, player_left_photo: winner.photo_url }
+                    : { player_right_name: winner.name, player_right_team: winner.team, player_right_photo: winner.photo_url },
+                )
+                .eq("id", nextM.scoreboard_match_id);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  if (changed) {
+    await reconcileBracketProgression(bracketId);
+  }
+}
+

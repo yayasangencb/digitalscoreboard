@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { BracketMatch, BracketParticipant, BracketRow } from "@/lib/bracket-logic";
+import { reconcileBracketProgression } from "@/lib/bracket-sync";
 
 export function useBracket(bracketId: string | undefined) {
   const [bracket, setBracket] = useState<BracketRow | null>(null);
@@ -19,6 +20,10 @@ export function useBracket(bracketId: string | undefined) {
       return;
     }
     setBracket(b);
+
+    // Auto-reconcile progression (advance winners/byes) before retrieving matches
+    await reconcileBracketProgression(bracketId);
+
     const [{ data: ps }, { data: ms }] = await Promise.all([
       supabase.from("bracket_participants").select("*").eq("bracket_id", bracketId).order("initial_position"),
       supabase.from("bracket_matches").select("*").eq("bracket_id", bracketId).order("match_number"),
@@ -51,6 +56,11 @@ export function useBracket(bracketId: string | undefined) {
         { event: "*", schema: "public", table: "bracket_matches", filter: `bracket_id=eq.${bracketId}` },
         () => void load(),
       )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "matches" },
+        () => void load(),
+      )
       .subscribe();
     return () => {
       void supabase.removeChannel(ch);
@@ -59,3 +69,4 @@ export function useBracket(bracketId: string | undefined) {
 
   return { bracket, participants, matches, loading, notFound, reload: load };
 }
+
