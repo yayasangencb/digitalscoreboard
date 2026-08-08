@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { BracketMatch, BracketParticipant, BracketRow } from "@/lib/bracket-logic";
 import { reconcileBracketProgression } from "@/lib/bracket-sync";
@@ -10,38 +10,57 @@ export function useBracket(bracketId: string | undefined) {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
-  const load = useCallback(async (isInitial = false) => {
-    if (!bracketId) return;
-    if (isInitial) setLoading(true);
+  const bracketRef = useRef<BracketRow | null>(bracket);
+  bracketRef.current = bracket;
 
-    const { data: b } = await supabase.from("brackets").select("*").eq("id", bracketId).maybeSingle();
-    if (!b) {
-      setNotFound(true);
-      setLoading(false);
-      return;
-    }
-    setBracket(b);
+  const load = useCallback(
+    async (isInitial = false, retryCount = 0) => {
+      if (!bracketId) return;
+      if (isInitial && !bracketRef.current) setLoading(true);
 
-    // Initial fetch of participants and matches for instant render
-    const [{ data: ps }, { data: ms }] = await Promise.all([
-      supabase.from("bracket_participants").select("*").eq("bracket_id", bracketId).order("initial_position"),
-      supabase.from("bracket_matches").select("*").eq("bracket_id", bracketId).order("match_number"),
-    ]);
+      const { data: b, error } = await supabase
+        .from("brackets")
+        .select("*")
+        .eq("id", bracketId)
+        .maybeSingle();
 
-    setParticipants(ps ?? []);
-    setMatches(ms ?? []);
-    setLoading(false);
+      if (error || !b) {
+        // High latency or initial connection glitch retry
+        if (retryCount < 2 && !bracketRef.current) {
+          setTimeout(() => void load(isInitial, retryCount + 1), 600);
+          return;
+        }
+        if (!bracketRef.current) {
+          setNotFound(true);
+        }
+        setLoading(false);
+        return;
+      }
 
-    // Auto-reconcile progression (advance winners/byes) in background without blocking UI
-    void reconcileBracketProgression(bracketId).then(async () => {
-      const [{ data: freshPs }, { data: freshMs }] = await Promise.all([
+      setNotFound(false);
+      setBracket(b);
+
+      const [{ data: ps }, { data: ms }] = await Promise.all([
         supabase.from("bracket_participants").select("*").eq("bracket_id", bracketId).order("initial_position"),
         supabase.from("bracket_matches").select("*").eq("bracket_id", bracketId).order("match_number"),
       ]);
-      if (freshPs) setParticipants(freshPs);
-      if (freshMs) setMatches(freshMs);
-    });
-  }, [bracketId]);
+
+      if (ps) setParticipants(ps);
+      if (ms) setMatches(ms);
+      setLoading(false);
+
+      // Auto-reconcile progression in background
+      void reconcileBracketProgression(bracketId).then(async () => {
+        const [{ data: freshPs }, { data: freshMs }] = await Promise.all([
+          supabase.from("bracket_participants").select("*").eq("bracket_id", bracketId).order("initial_position"),
+          supabase.from("bracket_matches").select("*").eq("bracket_id", bracketId).order("match_number"),
+        ]);
+        if (freshPs) setParticipants(freshPs);
+        if (freshMs) setMatches(freshMs);
+      });
+    },
+    [bracketId],
+  );
 
   useEffect(() => {
     void load(true);
@@ -79,5 +98,6 @@ export function useBracket(bracketId: string | undefined) {
 
   return { bracket, participants, matches, loading, notFound, reload: () => load(false) };
 }
+
 
 
