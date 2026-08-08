@@ -10,9 +10,11 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { BracketCanvas } from "@/components/BracketCanvas";
+import { ParticipantManager } from "@/components/ParticipantManager";
 import { useBracket } from "@/hooks/useBracket";
 import { roundCount, roundName, type BracketMatch } from "@/lib/bracket-logic";
 import { syncParticipantToMatches } from "@/lib/bracket-sync";
+
 
 export const Route = createFileRoute("/_authenticated/brackets/$id/edit")({
   ssr: false,
@@ -22,7 +24,7 @@ export const Route = createFileRoute("/_authenticated/brackets/$id/edit")({
 
 function EditBracketPage() {
   const { id } = Route.useParams();
-  const { bracket, participants, matches, loading, notFound } = useBracket(id);
+  const { bracket, participants, matches, loading, notFound, reload } = useBracket(id);
   const [selected, setSelected] = useState<BracketMatch | null>(null);
   const [propagateOpen, setPropagateOpen] = useState<{ match: BracketMatch; winnerId: string } | null>(null);
   const [bulkLoading, setBulkLoading] = useState(false);
@@ -219,6 +221,15 @@ function EditBracketPage() {
               </div>
             </CardContent>
           </Card>
+
+          <ParticipantManager
+            bracketId={bracket.id}
+            participants={participants}
+            matches={matches}
+            onChanged={() => void reload()}
+          />
+
+
 
           {selected && (
             <Card>
