@@ -173,7 +173,7 @@ export function useMatchActions(match: MatchRow | null, setMatch: (m: MatchRow) 
     const mw = matchWinner(setsLeft, setsRight, m.best_of);
     if (mw) {
       playMatchWon();
-      void update(
+      await update(
         {
           sets_left: setsLeft,
           sets_right: setsRight,
@@ -187,7 +187,7 @@ export function useMatchActions(match: MatchRow | null, setMatch: (m: MatchRow) 
         },
         { action: "match_finished" },
       );
-      void syncScoreboardMatchToBracket(m.id);
+      await syncScoreboardMatchToBracket(m.id);
       return "match_finished";
     }
     playSetWon();
