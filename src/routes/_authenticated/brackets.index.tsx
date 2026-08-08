@@ -24,10 +24,10 @@ function BracketListPage() {
   });
 
   const remove = async (id: string) => {
-    if (!confirm("Hapus bagan ini? Semua peserta dan pertandingan akan ikut terhapus.")) return;
-    const { error } = await supabase.from("brackets").delete().eq("id", id);
+    if (!confirm("Hapus bagan ini? Semua peserta dan pertandingan scoreboard yang terhubung akan ikut terhapus.")) return;
+    const { error } = await deleteBracketCascade(id);
     if (error) return toast.error(error.message);
-    toast.success("Bagan dihapus");
+    toast.success("Bagan & pertandingan terhubung dihapus");
     void refetch();
   };
 
