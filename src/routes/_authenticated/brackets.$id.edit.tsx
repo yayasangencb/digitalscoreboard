@@ -10,9 +10,11 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { BracketCanvas } from "@/components/BracketCanvas";
+import { ParticipantManager } from "@/components/ParticipantManager";
 import { useBracket } from "@/hooks/useBracket";
 import { roundCount, roundName, type BracketMatch } from "@/lib/bracket-logic";
 import { syncParticipantToMatches } from "@/lib/bracket-sync";
+
 
 export const Route = createFileRoute("/_authenticated/brackets/$id/edit")({
   ssr: false,
